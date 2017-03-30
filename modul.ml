@@ -9,246 +9,482 @@ module Key =
 
 module State_set = Set.Make(Key)
 
-
-type expr_type = 
-	  Int_type of int * int
-	| Bool_type
-	| Scalar_type of string list
-	| Module_type of modul 
-and modul = 
+(** Stage 0 -- 5 of the interpretation of modules in the input file. **)
+(** Stage 0: honestly generate all modules according to the semantics. **)
+type modul0 = 
 {
 	name : string;
 	parameter_list : (string * expr_type) list;
 	var_list : (string * expr_type) list;
 	symbol_tbl : (string, expr) Hashtbl.t;
 	init_assign : expr_module_instance list;
-	transitions : (expr * ((int * expr) list)) list;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness: formula list;
 	atomic_tbl : (string, expr) Hashtbl.t;
 	spec_list : (string * formula) list;
 }
-and modul_instance = 
+
+let output0 out (modul:modul0) is_model = 
+	(if is_model then output_string out ("Model name: " ^ modul.name ^ "\n{\n") else output_string out ("Module name: " ^ modul.name ^ "\n{\n"));
+	output_string out ("\tFormal parameters:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;
+	output_string out ("\n\tState variable definitions:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out ("\n\tUser defined symbols:\n");
+	Hashtbl.iter (fun a b -> output_string out ("\t\t"^a^" := "^ (str_expr b)^";\n")) modul.symbol_tbl;
+	output_string out ("\n\tInitial state definition:\n");
+	for i=0 to (List.length modul.init_assign - 1) do
+			output_string out ("\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (str_expr_module_instance (List.nth modul.init_assign i))^";\n")
+	done;
+	output_string out ("\n\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin
+		output_string out ("\n\tFairness definitions:\n");
+		List.iter (fun a -> output_string out ("\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out ("\n\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out ("\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out ("\n\tSpecifications:\n");
+		List.iter (fun a -> output_string out ("\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+	output_string out "}\n"
+
+
+
+(** Stage 1: expand all the definition of user defined symbols. **)
+type modul1 = 
 {
-	instance_name : string;
-	init_state : expr_module_instance list;
-	instance_transitions : (expr * ((int * expr) list)) list;
-	instance_atomic_tbl : (string, expr) Hashtbl.t;
-	instance_spec_list : (string * formula) list;
-}
-and model = 
-{
-	model_name : string;
-	model_var_list : (string * expr_type) list;
-	model_init_state : state;
-	model_transitions : (expr * ((int * expr) list)) list;
-	model_atomic_tbl : (string, expr) Hashtbl.t;
-	model_spec_list : (string * formula) list;
+	name : string;
+	parameter_list : (string * expr_type) list;
+	var_list : (string * expr_type) list;
+	init_assign : expr_module_instance list;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness: formula list;
+	atomic_tbl : (string, expr) Hashtbl.t;
+	spec_list : (string * formula) list;
 }
 
-let get_module_size modl =
-	let rec get_var_list_size vl = 
-	match vl with
-	| [] -> 0
-	| (s, Module_type m) :: vl' -> (get_var_list_size m.var_list) + (get_var_list_size vl')
-	| vt :: vl' -> (get_var_list_size vl') + 1 in
-	get_var_list_size modl.var_list
+let modul021 (m0:modul0) = 
+{
+	name = m0.name;
+	parameter_list = m0.parameter_list;
+	var_list = m0.var_list;
+	init_assign = List.map (fun a -> 
+			match a with
+			| Expr e -> Expr (expand_symbol_expr e (m0.symbol_tbl))
+			| Module_instance (s, el) -> Module_instance (s, expand_symbol_expr_list el m0.symbol_tbl)
+			) m0.init_assign;
+	transitions = List.map (fun a -> (expand_symbol_expr (fst a) m0.symbol_tbl, List.map (fun b -> (expand_symbol_expr (fst b) m0.symbol_tbl, expand_symbol_expr (snd b) m0.symbol_tbl)) (snd a))) m0.transitions;
+	fairness = m0.fairness;
+	atomic_tbl = (Hashtbl.iter (fun a b -> Hashtbl.replace m0.atomic_tbl a (expand_symbol_expr b m0.symbol_tbl)) m0.atomic_tbl; m0.atomic_tbl);
+	spec_list = m0.spec_list;
+}
 
-(************helper functions for instanciate the module***************)
-let init_replace_parameters modl para_ins = 
-	let rec replace_expr_module_instance emi = 
-	match emi with
-	| [] -> []
-	| (Expr e) :: emi' -> (Expr (Hashtbl.fold (fun a b c -> replace_parameter_expr c a b) para_ins (expand_symbol_expr e modl.symbol_tbl))) :: (replace_expr_module_instance emi')
-	| (Module_instance (s, es)) :: emi' -> (Module_instance (s, Hashtbl.fold (fun a b c -> replace_parameter_expr_list c a b) para_ins (expand_symbol_expr_list es modl.symbol_tbl))) :: (replace_expr_module_instance emi') in
-	replace_expr_module_instance modl.init_assign
+let output1 out (modul:modul1) is_model = 
+	(if is_model then output_string out ("Model name: " ^ modul.name ^ "\n{\n") else output_string out ("Module name: " ^ modul.name ^ "\n{\n"));
+	output_string out ("\tFormal parameters:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;
+	output_string out ("\n\tState variable definitions:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out ("\n\tInitial state definition:\n");
+	for i=0 to (List.length modul.init_assign - 1) do
+			output_string out ("\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (str_expr_module_instance (List.nth modul.init_assign i))^";\n")
+	done;
+	output_string out ("\n\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out ("\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin	
+		output_string out ("\n\tFairness definitions:\n");
+		List.iter (fun a -> output_string out ("\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out ("\n\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out ("\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out ("\n\tSpecifications:\n");
+		List.iter (fun a -> output_string out ("\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+	output_string out "}\n"
+
+
+(** Stage 2: apply the actural parameters to modules. **)
+type modul2 = 
+{
+	name : string;
+	var_list : (string * expr_type) list;
+	init_assign : expr_module_instance list;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness: formula list;
+	atomic_tbl : (string, expr) Hashtbl.t;
+	spec_list : (string * formula) list;
+	modul_tbl : (string, modul2) Hashtbl.t;
+}
+
+let rec modul122 (m1:modul1) actural_paras modul_tbl = 
+	let actural_moduls = Hashtbl.create 10 in
+	let actural_paras_length = List.length actural_paras in
+	let m2:modul2 = 
+	{
+		name = m1.name;
+		var_list = 
+			(let tmp_var_list = ref (m1.var_list) in
+			for i = 0 to actural_paras_length - 1 do
+				tmp_var_list := List.map (fun a -> (fst a, replace_parameter_expr_type (snd a) (fst (List.nth m1.parameter_list i)) (List.nth actural_paras i))) !tmp_var_list
+			done; !tmp_var_list);
+		init_assign = 
+			(let tmp_init_assign = ref (m1.init_assign) in
+			for i = 0 to actural_paras_length - 1 do
+				tmp_init_assign := List.map (fun a -> replace_parameter_expr_module_instance a (fst (List.nth m1.parameter_list i)) (List.nth actural_paras i)) !tmp_init_assign
+			done; !tmp_init_assign);
+		transitions =
+			(let tmp_transitions = ref (m1.transitions) in
+			for i = 0 to actural_paras_length - 1 do
+				let pvi = fst (List.nth m1.parameter_list i) and ei = (List.nth actural_paras i) in
+				tmp_transitions := List.map (fun a -> (replace_parameter_expr (fst a) pvi ei, List.map (fun b -> (replace_parameter_expr (fst b) pvi ei, replace_parameter_expr (snd b) pvi ei)) (snd a))) !tmp_transitions
+			done; !tmp_transitions);
+		fairness = m1.fairness;
+		atomic_tbl = 
+			(
+			for i = 0 to actural_paras_length - 1 do
+				Hashtbl.iter (fun a b -> Hashtbl.replace m1.atomic_tbl a (replace_parameter_expr b (fst (List.nth m1.parameter_list i)) (List.nth actural_paras i))) m1.atomic_tbl
+			done; m1.atomic_tbl);
+		spec_list = m1.spec_list;
+		modul_tbl = actural_moduls;
+	} in
+	for i = 0 to (List.length m2.var_list) - 1 do
+		match (List.nth m2.init_assign i) with
+		| Module_instance (s, el) -> let pm1 = Hashtbl.find modul_tbl s and el' = eval_expr_list el in
+			let pm2 = modul122 pm1 el' modul_tbl in
+			let pvi2 = fst (List.nth m2.var_list i) in
+			Hashtbl.add actural_moduls pvi2 pm2
+		| _ -> ()
+	done; m2
+
+let rec output2 out (modul:modul2) prefix_str is_model = 
+	(if is_model then output_string out (prefix_str^"Model name: " ^ modul.name ^ "\n"^prefix_str^"{\n") else output_string out (prefix_str^"Module name: " ^ modul.name ^ "\n"^prefix_str^"{\n"));
+	(*output_string out (prefix_str^"\tFormal parameters:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;*)
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable definitions:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tInitial state definition:\n");
+	for i=0 to (List.length modul.init_assign - 1) do
+			output_string out (prefix_str^"\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (str_expr_module_instance (List.nth modul.init_assign i))^";\n")
+	done;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin	
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tFairness definitions:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tSpecifications:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tSub modules:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := \n"); output2 out b (prefix_str^"\t\t") false) modul.modul_tbl;
+	output_string out (prefix_str^"}\n")
+
+
+(** Stage 3: expand the array definition. **)
+type modul3 = 
+{
+	name : string;
+	var_list : (string * expr_type) list;
+	init_assign : expr_module_instance list;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness: formula list;
+	atomic_tbl : (string, expr) Hashtbl.t;
+	spec_list : (string * formula) list;
+	modul_tbl : (string, modul3) Hashtbl.t;
+}
+
+let rec modul223 (m2:modul2) = 
+{
+	name = m2.name;
+	var_list = 
+		begin
+			let tmp_var_list = ref [] in
+			List.iter (fun a ->
+				match a with
+				| (s, Array_type (et, e)) -> (
+					let e1 = eval_expr e in
+					match e1 with
+					| Const c -> for i = 0 to c - 1 do
+									tmp_var_list := !tmp_var_list @ [(s^"_"^(string_of_int i), et)]
+								 done
+					| _ -> print_endline ("Size of array is not integer: "^(str_expr e1)); exit 1)
+				| _ -> tmp_var_list := !tmp_var_list @ [a]
+				) m2.var_list;
+			!tmp_var_list
+		end;
+	init_assign = 
+		begin
+			let tmp_init_assign = ref [] in
+			List.iter (fun a -> 
+				match a with
+				| Expr (Aray el) -> List.iter (fun b -> tmp_init_assign := !tmp_init_assign @ [Expr (eval_expr b)]) el
+				| Expr e -> tmp_init_assign := !tmp_init_assign @ [Expr (eval_expr e)]
+				| Module_instance (s, el) -> tmp_init_assign := !tmp_init_assign @ [Module_instance (s, eval_expr_list el)]
+				) m2.init_assign;
+			!tmp_init_assign
+		end;
+	transitions = m2.transitions;
+	fairness = m2.fairness;
+	atomic_tbl = m2.atomic_tbl;
+	spec_list = m2.spec_list;
+	modul_tbl = 
+		begin
+			let tmp_modul_tbl = Hashtbl.create (Hashtbl.length m2.modul_tbl) in
+			Hashtbl.iter (fun a b -> Hashtbl.add tmp_modul_tbl a (modul223 b)) m2.modul_tbl;
+			tmp_modul_tbl		
+		end;
+}
+
+let rec output3 out (modul:modul3) prefix_str is_model = 
+	(if is_model then output_string out (prefix_str^"Model name: " ^ modul.name ^ "\n"^prefix_str^"{\n") else output_string out (prefix_str^"Module name: " ^ modul.name ^ "\n"^prefix_str^"{\n"));
+	(*output_string out (prefix_str^"\tFormal parameters:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;*)
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable definitions:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tInitial state definition:\n");
+(*	print_endline ("Var list size: "^(string_of_int (List.length modul.var_list))^", Init assign size: "^ (string_of_int (List.length modul.init_assign)));*)
+	assert (List.length modul.init_assign = List.length modul.var_list);
+	for i=0 to (List.length modul.init_assign - 1) do
+		output_string out (prefix_str^"\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (str_expr_module_instance (List.nth modul.init_assign i))^";\n")
+	done;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin	
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tFairness definitions:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tSpecifications:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tSub modules:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := \n"); output3 out b (prefix_str^"\t\t") false) modul.modul_tbl;
+	output_string out (prefix_str^"}\n")
+
 	
-let trans_replace_parameters modl para_ins = 
-	let rec rest_replace_parameters rests = 
-	match rests with
-	| [] -> []
-	| (i, e) :: rests' -> (i, Hashtbl.fold (fun a b c -> replace_parameter_expr c a b) para_ins (expand_symbol_expr e modl.symbol_tbl)) :: (rest_replace_parameters rests')  in 
-	let rec trans_replace trans = 
-	match trans with
-	| [] -> []
-	| (e1, ies) :: trans' -> (Hashtbl.fold (fun a b c -> replace_parameter_expr c a b) para_ins (expand_symbol_expr e1 modl.symbol_tbl), rest_replace_parameters ies) :: (trans_replace trans') in
-	trans_replace modl.transitions
-
-let atomic_replace_parameters modl para_ins = 
-	let n = Hashtbl.length modl.atomic_tbl in
-	let tmp_atomic_tbl = Hashtbl.create n and
-		ttmp_atomic_tbl = Hashtbl.create n in
-	Hashtbl.iter (fun a b -> Hashtbl.add tmp_atomic_tbl a (expand_symbol_expr b modl.symbol_tbl)) modl.atomic_tbl;
-	Hashtbl.iter (fun a b -> Hashtbl.add ttmp_atomic_tbl a (Hashtbl.fold (fun c d g -> replace_parameter_expr g c d) para_ins b)) tmp_atomic_tbl;
-	ttmp_atomic_tbl
-(*
-	let tmp_atomic_tbl = Hashtbl.create (Hashtbl.length modl.atomic_tbl) in
-	Hashtbl.iter (fun a b -> Hashtbl.add tmp_atomic_tbl a (Hashtbl.fold (fun c d g -> replace_parameter_expr (expand_symbol_expr g modl.symbol_tbl) c d) para_ins b)) modl.atomic_tbl; tmp_atomic_tbl
-*)
-let spec_replace_parameters modl para_ins = modl.spec_list
-
-
-(*********************************************************************)
-
-let get_modl_instance modl para_ins = 
+(** Stage 4: convert separation definitions of modules to one single definition. **)
+type modul4 = 
 {
-	instance_name = modl.name;
-	init_state = init_replace_parameters modl para_ins;
-	instance_transitions = trans_replace_parameters modl para_ins;
-	instance_atomic_tbl = atomic_replace_parameters modl para_ins;
-	instance_spec_list = spec_replace_parameters modl para_ins;
+	name : string;
+	var_list : (string * expr_type) list;
+	var_index_tbl : (string, int) Hashtbl.t;
+	init_assign : expr list;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness : formula list;
+	atomic_tbl : (string, expr) Hashtbl.t;
+	spec_list : (string * formula) list;
 }
 
+let rec modul324 (m3:modul3) = 
+	let tmp_var_list = ref [] 
+	and tmp_var_index_tbl = Hashtbl.create (List.length m3.var_list)
+	and tmp_init_assign = ref []
+	and tmp_transitions = ref m3.transitions
+(*	and tmp_atomic_tbl = Hashtbl.create (Hashtbl.length m3.atomic_tbl) *)in
+	let add_prefix_transitions trans prefix = 
+		List.map (fun a -> (add_prefix_expr (fst a) prefix, List.map (fun b -> (add_prefix_expr (fst b) prefix, add_prefix_expr (snd b) prefix)) (snd a))) trans in
+	let product_transitions trans1 trans2 = 
+		let tmptmp_transitions = ref [] in
+		List.iter (fun a -> List.iter (fun b -> tmptmp_transitions := !tmptmp_transitions @ [(Ando (fst a, fst b), (snd a) @ (snd b))]) trans2) trans1; !tmptmp_transitions in
+	let rec expand_modul_def () = 
+		for i = 0 to (List.length m3.var_list - 1) do
+			let (s, et) = List.nth m3.var_list i in
+			match et with
+			| Module_type m -> (try 
+				let internal_modul = modul324 (Hashtbl.find m3.modul_tbl s) in
+					tmp_var_list := !tmp_var_list @ (List.map (fun a -> (s^"."^(fst a), snd a)) internal_modul.var_list);
+					tmp_init_assign := !tmp_init_assign @ (List.map (fun a -> add_prefix_expr a (s^".")) internal_modul.init_assign);
+					tmp_transitions := product_transitions !tmp_transitions (add_prefix_transitions internal_modul.transitions (s^"."))
+				with Not_found -> print_endline ("Module "^m^" in the definition of state variable "^s^" is not found."); exit 1)
+			| _ -> tmp_var_list := !tmp_var_list @ [(s, et)]; tmp_init_assign := !tmp_init_assign @ 
+				[
+				match (List.nth m3.init_assign i) with
+				| Expr e1 -> e1
+				| _ -> print_endline "module instance is not expression"; exit 1
+				]
+		done in
+	expand_modul_def ();
+	for i = 0 to (List.length !tmp_var_list - 1) do
+		Hashtbl.add tmp_var_index_tbl (fst (List.nth !tmp_var_list i)) i
+	done;
+	{
+		name = m3.name;
+		var_list = !tmp_var_list;
+		var_index_tbl = tmp_var_index_tbl;
+		init_assign = !tmp_init_assign;
+		transitions = !tmp_transitions;
+		fairness = m3.fairness;
+		atomic_tbl = m3.atomic_tbl;
+		spec_list = m3.spec_list;
+	}
 
-(***********helper functions for building models**********************)
-let rec build_var_list sb vl = 
-		match vl with
-		| [] -> []
-		| (s, et) :: vl' -> let sb' = (if sb = "" then s else (sb^"."^s)) in
-							match et with
-							| Module_type m -> (build_var_list sb' m.var_list) @ (build_var_list sb vl')
-							| t -> (sb', t) :: (build_var_list sb vl')
+let rec output4 out (modul:modul4) prefix_str is_model = 
+	(if is_model then output_string out (prefix_str^"Model name: " ^ modul.name ^ "\n"^prefix_str^"{\n") else output_string out (prefix_str^"Module name: " ^ modul.name ^ "\n"^prefix_str^"{\n"));
+	(*output_string out (prefix_str^"\tFormal parameters:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;*)
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable definitions:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable indics:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str ^ "\t\t" ^a ^" : " ^ (string_of_int b) ^ ";\n")) modul.var_index_tbl;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tInitial state definition:\n");
+(*	print_endline ("Var list size: "^(string_of_int (List.length modul.var_list))^", Init assign size: "^ (string_of_int (List.length modul.init_assign)));
+	assert (List.length modul.init_assign = List.length modul.var_list);*)
+	for i=0 to (List.length modul.init_assign - 1) do
+		output_string out (prefix_str^"\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (str_expr (List.nth modul.init_assign i))^";\n")
+	done;
 
-let rec raise_var_index_trans trans i = 
-	let rec raise_var_index_rest rests j = 
-	(match rests with
-	| [] -> []
-	| (ri, re) :: rests' -> (ri+j, raise_var_index_expr re j) :: (raise_var_index_rest rests' j)) in
-	match trans with
-	| [] -> []
-	| (e, rests) :: trans' -> (raise_var_index_expr e i, raise_var_index_rest rests i) :: (raise_var_index_trans trans' i)
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin	
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tFairness definitions:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tSpecifications:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+(*	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tSub modules:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := \n"); output3 out b (prefix_str^"\t\t") false) modul.modul_tbl;*)
+	output_string out (prefix_str^"}\n")
 
-let get_para_tbl vl es = 
-	let para_tbl = Hashtbl.create 5 in
-	let rec get_para_tbl_from_list vll ess = 
-		match vll with
-		| (v, vt) :: vll' -> Hashtbl.add para_tbl v (List.hd ess); get_para_tbl_from_list vll' (List.tl ess)
-		| [] -> () in
-	get_para_tbl_from_list vl es; para_tbl
-
-let product_trans trans1 trans2 = 
-	let tmp_trans = ref [] in
-	let rec connect_trans e1 ies1 t = 
-	(match t with
-	| [] -> ()
-	| (e2, ies2) :: t' -> tmp_trans := (Ando (e1, e2), ies1 @ ies2) :: !tmp_trans) in
-	let rec tmp_product_trans t1 t2 = 
-		match t1 with
-		| [] -> ()
-		| (e, ies) :: t1' -> connect_trans e ies t2; tmp_product_trans t1' t2 in
-	tmp_product_trans trans1 trans2; !tmp_trans
-
-let rec merge_inis inis i ia = 
-	match inis with
-	| [] -> ()
-	| (Expr (Const c)) :: inis' -> ia.(i) <- c; merge_inis inis' (i+1) ia
-	| _ -> print_endline "error merging initial states."; exit 1
-
-
-(*********************************************************************)
-let build_model modl moduls para_ins = 
-(*	let modul_instance_tbl = Hashtbl.create 5 in *)
-	let vl = build_var_list "" modl.var_list in
-	let ia = Array.make (List.length vl) 0 in
-	let modul_inst = get_modl_instance modl para_ins in
-	let trans = ref (modul_inst.instance_transitions) in
-	let rec build_init_state_trans emi i = 
-		(match emi with
-		| [] -> ()
-		| (Expr e) :: emi' -> (let ee = eval_expr e in 
-								(match ee with
-								| Const c -> (ia.(i) <- c)
-								| _ -> print_endline ((str_expr ee)^" is not a constant."); exit 1)); build_init_state_trans emi' (i+1)
-		| (Module_instance (s, es)) :: emi' -> (let md = Hashtbl.find moduls s in
-												let mdi = get_modl_instance md (get_para_tbl md.parameter_list es) in
-												let mi = get_module_size (Hashtbl.find moduls s) in 
-												merge_inis mdi.init_state i ia;
-												trans := product_trans !trans (raise_var_index_trans mdi.instance_transitions i);
-												build_init_state_trans emi' (i+mi))) in
-	build_init_state_trans modul_inst.init_state 0;
+(** Stage 5: conver variables of string format to ones with integer format. **)
+type modul5 = 
 {
-	model_name = modl.name;
-	model_var_list = vl;
-	model_init_state = State ia;
-	model_transitions = !trans;
-	model_atomic_tbl = modul_inst.instance_atomic_tbl;
-	model_spec_list = modul_inst.instance_spec_list;
+	name : string;
+	var_list : (string * expr_type) list;
+	var_index_tbl : (string, int) Hashtbl.t;
+	init_assign : int array;
+	transitions : (expr * ((expr * expr) list)) list;
+	fairness : formula list;
+	atomic_tbl : (string, expr) Hashtbl.t;
+	spec_list : (string * formula) list;
 }
 
-let str_expr_type et = 
-	match et with
-	| Int_type (i1, i2) -> "int("^(string_of_int i1)^", "^(string_of_int i2)^")"
-	| Bool_type -> "bool"
-	| Scalar_type sl -> let rec str_str_list strs = if List.length strs <> 0 then (List.hd strs)^(str_str_list (List.tl strs)^" ") else "" in "{"^(str_str_list sl)^"}"
-	| Module_type m -> m.name
+let modul425 (m4:modul4) = 
+{
+	name = m4.name;
+	var_list = m4.var_list;
+	var_index_tbl = m4.var_index_tbl;
+	init_assign = 
+		begin
+			let tmp_ary_length = List.length m4.var_list in
+			let tmp_ary = Array.make tmp_ary_length 0 in
+			for i = 0 to tmp_ary_length - 1 do
+				match (eval_expr (List.nth m4.init_assign i)) with
+				| Const c -> tmp_ary.(i) <- c
+				| e -> print_endline ("Invalid initial assignment: "^(str_expr e)); exit 1
+			done;
+			tmp_ary
+		end;
+	transitions = List.map (fun a -> (var_str_to_int_expr (eval_expr (fst a)) m4.var_index_tbl, List.map (fun b -> (var_str_to_int_expr (eval_expr (fst b)) m4.var_index_tbl, var_str_to_int_expr (eval_expr (snd b)) m4.var_index_tbl)) (snd a))) m4.transitions;
+	fairness = m4.fairness;
+	atomic_tbl = (Hashtbl.iter (fun a b -> Hashtbl.replace m4.atomic_tbl a (var_str_to_int_expr (eval_expr b) m4.var_index_tbl)) m4.atomic_tbl; m4.atomic_tbl);
+	spec_list = m4.spec_list;
+}
 
-let rec str_state_rest strest = 
-	match strest with
-	| [] -> ""
-	| (i, e) :: strest' -> (string_of_int i)^":="^(str_expr e)^"; "^(str_state_rest strest')
+let rec output5 out (modul:modul5) prefix_str is_model = 
+	(if is_model then output_string out (prefix_str^"Model name: " ^ modul.name ^ "\n"^prefix_str^"{\n") else output_string out (prefix_str^"Module name: " ^ modul.name ^ "\n"^prefix_str^"{\n"));
+	(*output_string out (prefix_str^"\tFormal parameters:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.parameter_list;*)
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable definitions:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" : "^ (str_expr_type (snd a))^";\n")) modul.var_list;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tState variable indics:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str ^ "\t\t" ^a ^" : " ^ (string_of_int b) ^ ";\n")) modul.var_index_tbl;
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tInitial state definition:\n");
+(*	print_endline ("Var list size: "^(string_of_int (List.length modul.var_list))^", Init assign size: "^ (string_of_int (List.length modul.init_assign)));
+	assert (List.length modul.init_assign = List.length modul.var_list);*)
+	for i=0 to (List.length modul.var_list - 1) do
+		output_string out (prefix_str^"\t\t"^(fst (List.nth modul.var_list i)) ^ " := " ^ (string_of_int (modul.init_assign.(i)))^";\n")
+	done;
 
+	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tTransition relation definition:\n");
+	List.iter (fun a -> output_string out (prefix_str^"\t\t"^(str_expr (fst a))^" : "^"{"^(str_state_reste (snd a))^"};\n")) modul.transitions;
+	if is_model then
+	begin	
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tFairness definitions:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fml_to_string a)^";\n")) modul.fairness;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tAtomic formula definitions:\n");
+		Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := "^(str_expr b)^";\n")) modul.atomic_tbl;
+		output_string out (prefix_str^"\n");
+		output_string out (prefix_str^"\tSpecifications:\n");
+		List.iter (fun a -> output_string out (prefix_str^"\t\t"^(fst a)^" := "^(fml_to_string (snd a))^";\n")) modul.spec_list
+	end;
+(*	output_string out (prefix_str^"\n");
+	output_string out (prefix_str^"\tSub modules:\n");
+	Hashtbl.iter (fun a b -> output_string out (prefix_str^"\t\t"^a^" := \n"); output3 out b (prefix_str^"\t\t") false) modul.modul_tbl;*)
+	output_string out (prefix_str^"}\n")
 
-let print_module modl = 
-	print_endline "******Print Module*******";
-	print_endline "*name: ";
-	print_endline modl.name;
-	print_endline "*parameters: ";
-	List.iter (fun a -> print_endline ((fst a)^": "^(str_expr_type (snd a)))) modl.parameter_list;
-	print_endline "*variables: ";
-	List.iter (fun a -> print_endline ((fst a)^": "^(str_expr_type (snd a)))) modl.var_list;
-	print_endline "*symbols:";
-	Hashtbl.iter (fun a b -> print_endline (a^":="^(str_expr b))) modl.symbol_tbl;
-	print_endline "*init assign:";
-	List.iter (fun a -> print_endline (
-										match a with
-										| Expr e -> str_expr e
-										| Module_instance (s, es) -> (s^"("^(str_expr_list es)^")"))) modl.init_assign; 
-	print_endline "*transitions:";
-	List.iter (fun a -> print_endline ((str_expr (fst a))^" {"^(str_state_rest (snd a))^"}")) modl.transitions;
-	print_endline "*atomic formulae:";
-	Hashtbl.iter (fun a b -> print_endline (a^":="^(str_expr b))) modl.atomic_tbl;
-	print_endline "*specs:";
-	List.iter (fun a -> print_endline ((fst a)^":="^(fml_to_string (snd a)))) modl.spec_list;
-	print_endline "****End Print Module*****"
+type model = modul5
 
-let print_model modl = 
-	print_endline "******Print Model*******";
-	print_endline "*name: ";
-	print_endline modl.model_name;
-	print_endline "*init state:";
-	print_endline (str_state modl.model_init_state); 
-	print_endline "*transitions:";
-	List.iter (fun a -> print_endline ((str_expr (fst a))^" {"^(str_state_rest (snd a))^"}")) modl.model_transitions;
-	print_endline "*atomic formulae:";
-	Hashtbl.iter (fun a b -> print_endline (a^":="^(str_expr b))) modl.model_atomic_tbl;
-	print_endline "*specs:";
-	List.iter (fun a -> print_endline ((fst a)^":="^(fml_to_string (snd a)))) modl.model_spec_list;
-	print_endline "****End Print Model*****"
-
-let rec get_new_constant_array ia rests cia = 
+let rec get_new_constant_array ia rests cia var_index_tbl = 
 	match rests with
 	| [] -> cia
-	| (i, e) :: rests' -> (match eval_with_state e (State ia) with
-							| Const c -> get_new_constant_array ia rests' (cia.(i) <- c; cia)
-							| _ -> print_endline "error constructing new states."; exit 1)
+	| (e1, e2) :: rests' -> match e1 with
+							| Var i -> (match eval_with_array e2 (ia) var_index_tbl with
+										| Const c -> get_new_constant_array ia rests' (cia.(i) <- c; cia) var_index_tbl
+										| _ -> print_endline "error constructing new states."; exit 1)
+							| _ -> (match (var_str_to_int_expr (eval_with_array e1 ia var_index_tbl) var_index_tbl) with
+									| Var j -> (match eval_with_array e2 (ia) var_index_tbl with
+												| Const c -> get_new_constant_array ia rests' (cia.(j) <- c; cia) var_index_tbl
+												| _ -> print_endline "error constructing new states."; exit 1)
+									| _ -> print_endline ("can not find position of "^(str_expr (e1))); print_endline (str_expr (eval_with_array e1 ia var_index_tbl)); exit 1)
+
 
 (*computing next state, new version*)
-let rec next ia trans = 
+let rec next ia trans var_index_tbl = 
 	let ss = ref (State_set.empty) in
 	let rec eval_trans trans = 
 	match trans with
-	| (e, rests) :: trans' -> (match (eval_with_array e ia) with
-								| Const 1 -> ss := State_set.add (get_new_constant_array ia rests (Array.copy ia)) !ss; eval_trans trans'
-								| Const (-1) -> eval_trans trans'
+	| (e, rests) :: trans' -> (match (eval_with_array e ia var_index_tbl) with
+								| Const 1 -> ss := State_set.add (get_new_constant_array ia rests (Array.copy ia) var_index_tbl ) !ss; eval_trans trans'
+								| Const (0) -> eval_trans trans'
 								| _ -> print_endline ("error evaluating expression "^(str_expr e)^"."); exit 1)
 	| [] -> () in 
-	eval_trans trans; !ss
+	eval_trans trans; 
+	if State_set.is_empty !ss then ss := State_set.singleton ia;
+	(*print_endline ((string_of_int (State_set.cardinal !ss)) ^ "\tnext states.");*)
+	!ss
 
 
 
-let apply_atomic e sl = 
-	let b = eval_expr_with_states e sl in
+let apply_atomic e sl var_index_tbl = 
+	let b = eval_expr_with_states e sl var_index_tbl in
 	match b with
 	| Const 1 -> Top
-	| Const (-1) -> Bottom
+	| Const (0) -> Bottom
 	| _ -> print_endline ((str_expr b)^" is not a constant, in apply atomic."); exit 1 
 
 let str_modl_state vt sa = 
@@ -257,14 +493,16 @@ let str_modl_state vt sa =
 		| [] -> ""
 		| [(v, t)] -> (match t with
 						| Int_type (i1, i2) -> (v^":="^(string_of_int (ia.(i))))
-						| Bool_type -> (v^":="^(if (ia.(i)=1) then "true" else (if (ia.(i)=(-1)) then "false" else "unknown_bool_value")))
+						| Bool_type -> (v^":="^(if (ia.(i)=1) then "true" else (if (ia.(i)=(0)) then "false" else "unknown_bool_value")))
 						| Scalar_type sl -> (v^":="^(List.nth sl (ia.(i))))
-						| Module_type m -> print_endline "Error: state not expanded."; exit (-1))
+						| Module_type m -> print_endline "Error: submodule not expanded."; exit (-1)
+						| Array_type (_, _) -> print_endline "Error: array not expanded."; exit (-1))
 		| (v, t) :: vt' -> (match t with
 						| Int_type (i1, i2) -> (v^":="^(string_of_int (ia.(i)))^";")
-						| Bool_type -> (v^":="^(if (ia.(i)=1) then "true" else (if (ia.(i)=(-1)) then "false" else "unknown_bool_value"))^";")
+						| Bool_type -> (v^":="^(if (ia.(i)=1) then "true" else (if (ia.(i)=(0)) then "false" else "unknown_bool_value"))^";")
 						| Scalar_type sl -> (v^":="^(List.nth sl (ia.(i)))^";")
-						| Module_type m -> print_endline "Error: state not expanded."; exit (-1)) ^ (str_type_value vt' ia (i+1)) in
+						| Module_type m -> print_endline "Error: state not expanded."; exit (-1)
+						| Array_type (_, _) -> print_endline "Error: state not expanded."; exit (-1)) ^ (str_type_value vt' ia (i+1)) in
 	"{"^(str_type_value vt sa 0)^"}"
 
 let str_modl_state_or_var vt st = 

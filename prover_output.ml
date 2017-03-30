@@ -17,7 +17,7 @@ module type Prover =
 		val sequents : (int, (State_set.t * formula)) Hashtbl.t
 		val proof : (int, int list) Hashtbl.t
 		val counterexample : (int, int list) Hashtbl.t
-		val output_result : bool -> string -> (int, (State_set.t * formula)) Hashtbl.t -> (int, int list) Hashtbl.t -> out_channel -> (string * Modul.expr_type) list -> unit
+		val output_result : bool -> string -> (int, (State_set.t * formula)) Hashtbl.t -> (int, int list) Hashtbl.t -> out_channel -> (string * expr_type) list -> unit
 		val current_id : int ref
 		val new_id : unit -> int
 		
@@ -161,61 +161,61 @@ module Seq_Prover : Prover =
 			match fml with
 			| Top -> prove (contl()) modl
 			| Bottom -> prove (contr()) modl
-			| Atomic (s, sl) -> let v = apply_atomic (Hashtbl.find modl.model_atomic_tbl s) sl in
+			| Atomic (s, sl) -> let v = apply_atomic (Hashtbl.find modl.atomic_tbl s) sl modl.var_index_tbl in
 									if v = Top then (prove (contl()) modl) else if v = Bottom then prove (contr()) modl else raise Error_proving_atomic
-			| Neg Atomic (s, sl) -> let v = apply_atomic (Hashtbl.find modl.model_atomic_tbl s) sl in
+			| Neg Atomic (s, sl) -> let v = apply_atomic (Hashtbl.find modl.atomic_tbl s) sl modl.var_index_tbl in
 										if v = Top then prove (contr()) modl else if v = Bottom then prove (contl()) modl else raise Error_proving_atomic
 			| And (fml1, fml2) -> let id1 = new_id() and id2 = new_id() in
 				prove (Cont (State_set.empty, fml1, (id1), (levl^"1"), (fun () -> Cont (State_set.empty, fml2, (id2), (levl^"2"), (fun () -> add_premises proof id (id1); add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id2); contr()))), (fun () -> add_premises counterexample id (id1); contr()))) modl
 			| Or (fml1, fml2) -> let id1 = new_id() and id2 = new_id() in
 				prove (Cont (State_set.empty, fml1, (id1), (levl^"1"), (fun () -> add_premises proof id (id1); contl()), (fun () -> Cont (State_set.empty, fml2, (id2), (levl^"2"), (fun () -> add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id1); add_premises counterexample id (id2); contr()))))) modl
-			| AX (s, fml1, State sa) -> prove ((make_ax_cont State_set.empty s fml1 id (levl^"1") ((next sa modl.model_transitions)) contl contr)()) modl
-			| EX (s, fml1, State sa) -> prove ((make_ex_cont State_set.empty s fml1 id (levl^"1") ((next sa modl.model_transitions)) contl contr)()) modl
+			| AX (s, fml1, State sa) -> prove ((make_ax_cont State_set.empty s fml1 id (levl^"1") ((next sa modl.transitions modl.var_index_tbl)) contl contr)()) modl
+			| EX (s, fml1, State sa) -> prove ((make_ex_cont State_set.empty s fml1 id (levl^"1") ((next sa modl.transitions modl.var_index_tbl)) contl contr)()) modl
 			| AF (s, fml1, State sa) -> if State_set.mem sa gamma then 
 									(add_merge merges levl gamma; prove (contr()) modl) else 
 									(if state_in_merge merges levl sa then prove (contr()) modl else 
 									let id1 = new_id() in
-									prove (Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); contl()), (fun () -> add_premises counterexample id (id1); (make_af_cont (State_set.add sa gamma) s fml1 id levl (((next sa modl.model_transitions))) contl contr)()))) modl)
+									prove (Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); contl()), (fun () -> add_premises counterexample id (id1); (make_af_cont (State_set.add sa gamma) s fml1 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()))) modl)
 			| EG (s, fml1, State sa) -> if State_set.mem sa gamma then 
 									(add_merge merges levl gamma; prove (contl()) modl) else
 									(if state_in_merge merges levl sa then prove (contl()) modl else 
 									let id1 = new_id() in
-									prove (Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1);(make_eg_cont (State_set.add sa gamma) s fml1 id levl (((next sa modl.model_transitions))) contl contr)()), (fun () -> add_premises counterexample id (id1); contr()))) modl)
+									prove (Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1);(make_eg_cont (State_set.add sa gamma) s fml1 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()), (fun () -> add_premises counterexample id (id1); contr()))) modl)
 			| AR(x, y, fml1, fml2, State sa) -> if (State_set.is_empty gamma) then Hashtbl.replace merges levl State_set.empty else add_merge merges levl gamma; if State_set.mem sa gamma then 
 											(add_merge merges levl gamma; prove (contl()) modl) else 
 											(if state_in_merge merges levl sa then prove (contl()) modl else
 				let id1 = new_id() and id2 = new_id() in
-				prove (Cont (State_set.empty, Formula.subst_s fml2 y (State sa), (id2), (levl^"2"), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 x (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id1); (make_ar_cont (State_set.singleton sa) x y fml1 fml2 id levl (((next sa modl.model_transitions))) contl contr)()))), (fun () -> add_premises counterexample id (id+2); contr()))) modl)
+				prove (Cont (State_set.empty, Formula.subst_s fml2 y (State sa), (id2), (levl^"2"), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 x (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id1); (make_ar_cont (State_set.singleton sa) x y fml1 fml2 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()))), (fun () -> add_premises counterexample id (id+2); contr()))) modl)
 			(*| AR(x, y, fml1, fml2, State sa) -> if (State_set.is_empty gamma) then Hashtbl.replace merges levl State_set.empty; if State_set.mem sa gamma then 
 											(add_merge merges levl gamma; prove (contl()) modl) else 
 											(if state_in_merge merges levl sa then prove (contl()) modl else
 				let id1 = new_id() and id2 = new_id() in
-				prove (Cont (State_set.empty, Formula.subst_s fml2 y (State sa), (id2), (levl^"2"), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 x (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id1); (make_ar_cont (State_set.add sa gamma) x y fml1 fml2 id levl (((next sa modl.model_transitions))) contl contr)()))), (fun () -> add_premises counterexample id (id+2); contr()))) modl) *)
+				prove (Cont (State_set.empty, Formula.subst_s fml2 y (State sa), (id2), (levl^"2"), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 x (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); add_premises proof id (id2); contl()), (fun () -> add_premises counterexample id (id1); (make_ar_cont (State_set.add sa gamma) x y fml1 fml2 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()))), (fun () -> add_premises counterexample id (id+2); contr()))) modl) *)
 			| EU (s, s', fml1, fml2, State sa) -> if (State_set.is_empty gamma) then Hashtbl.replace merges levl State_set.empty else add_merge merges levl gamma; if State_set.mem sa gamma then 
 												(prove (contr()) modl) else
 												( if state_in_merge merges levl sa then prove (contr()) modl else
 									let id1 = new_id() and id2 = new_id() in
-									((prove (Cont (State_set.empty, Formula.subst_s fml2 s' (State sa), (id2), (levl^"2"), (fun () -> add_premises proof id (id2); contl()), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); (make_eu_cont (State_set.singleton sa) s s' fml1 fml2 id levl (((next sa modl.model_transitions))) contl contr)()), (fun () -> add_premises counterexample id (id1); add_premises counterexample id (id2); contr()))))) modl)))  
+									((prove (Cont (State_set.empty, Formula.subst_s fml2 s' (State sa), (id2), (levl^"2"), (fun () -> add_premises proof id (id2); contl()), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); (make_eu_cont (State_set.singleton sa) s s' fml1 fml2 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()), (fun () -> add_premises counterexample id (id1); add_premises counterexample id (id2); contr()))))) modl)))  
 			(*| EU (s, s', fml1, fml2, State sa) -> if (State_set.is_empty gamma) then Hashtbl.replace merges levl State_set.empty; if State_set.mem sa gamma then 
 												(add_merge merges levl gamma; prove (contr()) modl) else
 												( if state_in_merge merges levl sa then prove (contr()) modl else
 									let id1 = new_id() and id2 = new_id() in
-									((prove (Cont (State_set.empty, Formula.subst_s fml2 s' (State sa), (id2), (levl^"2"), (fun () -> add_premises proof id (id2); contl()), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); (make_eu_cont (State_set.add sa gamma) s s' fml1 fml2 id levl (((next sa modl.model_transitions))) contl contr)()), (fun () -> add_premises counterexample id (id1); add_premises counterexample id (id2); contr()))))) modl)))  *)
+									((prove (Cont (State_set.empty, Formula.subst_s fml2 s' (State sa), (id2), (levl^"2"), (fun () -> add_premises proof id (id2); contl()), (fun () -> Cont (State_set.empty, Formula.subst_s fml1 s (State sa), (id1), (levl^"1"), (fun () -> add_premises proof id (id1); (make_eu_cont (State_set.add sa gamma) s s' fml1 fml2 id levl (((next sa modl.transitions modl.var_index_tbl))) contl contr)()), (fun () -> add_premises counterexample id (id1); add_premises counterexample id (id2); contr()))))) modl)))  *)
 			| _ -> raise Unable_to_prove
 			)
 	
 	let rec prove_model modl out outname = 
-		let spec_lst = modl.model_spec_list in
+		let spec_lst = modl.spec_list in
 		let rec prove_lst lst = 
 		match lst with
 		| [] -> ()
 		| (s, fml) :: lst' -> 
 			((let nnf_fml = nnf fml in 
-				print_endline (s^": "^(str_modl_fml modl.model_var_list (nnf_fml)));
+				print_endline (s^": "^(str_modl_fml modl.var_list (nnf_fml)));
 				pre_process_merges (select_sub_fmls (sub_fmls nnf_fml "1"));
-				let b = (prove (Cont (State_set.empty, Formula.subst_s (nnf_fml) (SVar "ini") modl.model_init_state, 0, "1", (fun () -> Basic true), (fun () -> Basic false))) modl) in
+				let b = (prove (Cont (State_set.empty, Formula.subst_s (nnf_fml) (SVar "ini") (State modl.init_assign), 0, "1", (fun () -> Basic true), (fun () -> Basic false))) modl) in
 					print_endline (s ^ " is " ^ (if b then "true, proof output to \"output.out\"." else "false, counterexample output to \""^outname^"\".")); 
-					output_result b s sequents (if b then proof else counterexample) out modl.model_var_list; 
+					output_result b s sequents (if b then proof else counterexample) out modl.var_list; 
 					output_string out "***********************************ouput complete**************************************";
 					flush out; 
 					Hashtbl.clear sequents; 

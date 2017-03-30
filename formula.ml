@@ -13,13 +13,6 @@ type formula =
 	| EG of state * formula * state
 	| AR of state * state * formula * formula * state
 	| EU of state * state * formula * formula * state
-(*
-val subst_e : formula -> expr -> expr -> formula
-val subst_s : formula -> state -> state -> formula
-val nnf : formula -> formula
-val neg : formula -> formula
-val to_string : formula -> string
-*)
 
 (* substitute expression in formula *)
 let rec subst_e fml e1 e2 = 
@@ -107,7 +100,8 @@ let rec sub_fmls fml levl =
 	Hashtbl.iter (fun a b -> Hashtbl.add tbl1 a b) tbl2 in
 	Hashtbl.add fml_levl_tbl levl fml;
 	match fml with
-	| Neg fml1 -> add_tbl fml_levl_tbl (sub_fmls fml1 (levl^"1")); fml_levl_tbl
+	(*| Atomic _ -> Hashtbl.add fml_levl_tbl levl *)
+	(*| Neg fml1 -> add_tbl fml_levl_tbl (sub_fmls fml1 (levl^"1")); fml_levl_tbl*)
 	| And (fml1, fml2) -> add_tbl fml_levl_tbl (sub_fmls fml1 (levl^"1")); add_tbl fml_levl_tbl (sub_fmls fml2 (levl^"2")); fml_levl_tbl
 	| Or (fml1, fml2) -> add_tbl fml_levl_tbl (sub_fmls fml1 (levl^"1")); add_tbl fml_levl_tbl (sub_fmls fml2 (levl^"2")); fml_levl_tbl
 	| AX (s, fml1, s') -> add_tbl fml_levl_tbl (sub_fmls fml1 (levl^"1")); fml_levl_tbl
@@ -125,6 +119,10 @@ let select_sub_fmls fml_levl_tbl =
 	| EG _ -> true
 	| AR _ -> true
 	| EU _ -> true
+	| AX _ -> true
+	| EX _ -> true
+	| Atomic _ -> true
+	| Neg (Atomic _) -> true
 	| _ -> false) in
 	Hashtbl.iter (fun a b -> if (filter b = false) then Hashtbl.remove fml_levl_tbl a else ()) fml_levl_tbl; fml_levl_tbl
 

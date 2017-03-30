@@ -8,6 +8,10 @@ Model River_Crossing()
 		cabbage : Bool;
 	}
 	
+	//initial state definition
+	/*
+		multi line comments
+	*/
 	Init
 	{
 		farmer := false;

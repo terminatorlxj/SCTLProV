@@ -1,6 +1,7 @@
 {
 	open Parser
-	let line_num = ref 0
+	let line_num = ref 1
+
 }
 
 let integer = ['0'-'9']+
@@ -13,6 +14,7 @@ rule token = parse
 	| "Define"	{Define}
 	| "Init"	{Init}
 	| "Transition"	{Transition}
+	| "Fairness"	{Fairness}
 	| "Atomic"	{Atomic}
 	| "Spec"	{Spec}
 	| "Int"		{Int}
@@ -22,6 +24,7 @@ rule token = parse
 	| "TRUE"	{Top}
 	| "FALSE"	{Bottom}
 	| "not"		{Neg}
+	| "mod"	{Mod}
 	| "AX"	{AX}
 	| "EX"	{EX}
 	| "AF"	{AF}
@@ -59,6 +62,20 @@ rule token = parse
 	| "!="		{Non_equal}
 	| '\n'		{line_num := (!line_num) + 1; token lexbuf}
 	| [' ' '\t' '\r']+	{token lexbuf}	
+	| "//"		{comment_oneline lexbuf}
+	| "/*"		{comment_multiline lexbuf}
 	| eof		{File_end}
+
+and comment_oneline = parse
+	| '\n' {line_num := (!line_num) + 1; token lexbuf}
+	| _	{comment_oneline lexbuf}
+and comment_multiline = parse
+	| "*/"	{token lexbuf}
+	| '\n'	{line_num := (!line_num) + 1; comment_multiline lexbuf}
+	| _			{comment_multiline lexbuf}
+
+
+
+
 
 
