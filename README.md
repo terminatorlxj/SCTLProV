@@ -26,32 +26,18 @@ This is the implementation of the SCTL system, named SCTLProV. The source code o
 ----------
 
 # 3 How to Use The Tool
-We compile the executable files for the platforms of 32(64)-bit Linux, and 32(64)-bit Windows.
 
-For the Linux version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the terminal of the operating system:
+General Usage:
 
-	sctl "input_file_name"
+	sctl [-bdd] [-output <output_file_name>] input_file_name
 
-and when we want to output the certificates or counterexamples, we enter the following command:
-
-	sctl -output "output_file_name" "input_file_name"
-
-where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
-
-For the Windows version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the command line of the operating system:
-
-	sctl.exe "input_file_name"
-
-and when we want to output the certificates or counterexamples, we enter the following command:
-
-	sctl.exe -output "output_file_name" "input_file_name"
-
-where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
+- Use BDDs to store sets of states, if option `-bdd` is specified.
+- Output the proof tree to file `output_file_name` if option `-output output_file_name` is specified.
 
 
-**In practice, running `sctl "input_file_name"` is usually faster than 
-`sctl -output "output_file_name" "input_file_name"`, but not very much.** 
-**So if efficiency is your main concern, use `sctl "input_file_name"` in your verification.**
+**In practice, SCTLProV runs faster (not very much) when the `-output` option is not specified. 
+So if efficiency is your main concern, do not use the output option.
+When option `-bdd` is specified, SCTLProV usually consumes more time and less memory space than not using `-bdd` option.**
 
 ----------
 
