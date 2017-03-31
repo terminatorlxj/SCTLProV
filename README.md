@@ -1,3 +1,122 @@
+# 1 Introduction
+
+This is the implementation of the SCTL system, named SCTLProV. The source code of SCTLProV is written in programming language OCaml. Some important files in this project are listed as follows.
+
+- term.ml: definition of expressions, states, and relative functions.
+- formula.ml: definition of formulae, and relative functions.
+- modul.ml: definition of modules, and relative functions.
+- prover.ml: implementation of rewrite rules over continuation-passing trees, and relative functions.
+- prover_bdd.ml: another prover module where BDDs are used to store sets of states.
+- prover_output.ml: another prover module that can produce more output.
+- bdd.ml: simple interfaces of using BDDs in this project.
+- main.ml: entry of the whole project.
+- lexer.mll: lexer generator.
+- parser.mly: parser generator.
+- river.model: an illustrative example.
+- LICENSE: the license file.
+- README.md: this file.
+
+# 2 How to Compile the Source Code
+
+1. Install [OCaml](https://ocaml.org/), [opam](https://opam.ocaml.org/), and install [mlcuddidl](https://opam.ocaml.org/packages/mlcuddidl/) via opam;
+2. Input `make win` (`make linux`) in the windows command line (linux terminal) , or input `make win-opt` (or `make linux-opt` in the linux terminal) if you want a optimized version. 
+3. If option 2 failed, then just copy the corresponding commands in the file `Makefile` and compile the code by hand.
+4. If your installization fails anyway, try to update OCaml into the latest version (4.04.0 for now), and then compile the source code.
+
+----------
+
+# 3 How to Use The Tool
+We compile the executable files for the platforms of 32(64)-bit Linux, and 32(64)-bit Windows.
+
+For the Linux version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the terminal of the operating system:
+
+	sctl "input_file_name"
+
+and when we want to output the certificates or counterexamples, we enter the following command:
+
+	sctl -output "output_file_name" "input_file_name"
+
+where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
+
+For the Windows version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the command line of the operating system:
+
+	sctl.exe "input_file_name"
+
+and when we want to output the certificates or counterexamples, we enter the following command:
+
+	sctl.exe -output "output_file_name" "input_file_name"
+
+where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
+
+
+**In practice, running `sctl "input_file_name"` is usually faster than 
+`sctl -output "output_file_name" "input_file_name"`, but not very much.** 
+**So if efficiency is your main concern, use `sctl "input_file_name"` in your verification.**
+
+----------
+
+# 4 An illustrative example
+
+This example concerns the so-called River Crossing Puzzle
+problem.  The question is how can the farmer bring the wolf, the goat,
+and the cabbage get across the river?  We formalize this problem as a
+Kripke model `M` and the question as a specification.  The initial
+state `ini` of model `M` has four components: the initial
+position of the farmer, the wolf, the goat, and the cabbage.  Every
+transition from one state to another corresponds to every move of the
+farmer from one side of the river to another, whether he will carry
+the wolf, the goat, or the cabbage or not.  The specification is that
+if there exists a state `s` can be reachable from `ini`, such
+that in `s`, all of them get on the other side of the river.  the
+farmer, the wolf, the goat, and the cabbage have crossed the river.
+These data compose the input file (`river.model`) as listed below:
+
+	Model River_Crossing()
+	{
+		Var 
+		{
+			farmer:Bool; wolf:Bool; goat:Bool; cabbage:Bool;
+		}
+	 	Init 
+		{
+			farmer:=false; wolf:=false; goat:=false; cabbage:=false;
+		}
+		Transition
+		{ 
+			farmer=wolf:    {wolf:=!wolf;};
+		   	farmer=goat:    {goat:=!goat;};
+		   	farmer=cabbage: {cabbage:=!cabbage;};
+		   	true:           {farmer:=!farmer;};
+		}	
+		Atomic
+		{
+			safe(s):=!(s(wolf)=s(goat)&&s(wolf)!=s(farmer))&&!(s(goat)=s(cabbage)&&s(goat)!= s(farmer));
+		 	complete(s):=s(farmer)=true&&s(wolf)=true && s(goat)=true&&s(cabbage)=true;
+		}
+		Spec
+		{ 
+			find:=EU(x,y,safe(x),complete(y),ini);
+		}
+	}
+
+
+Note that in this input file, two atomic formulae: `safe(s)` and
+`complete(s)` are given.  `safe(s)` being true means that, in state
+`s`, neither the goat nor the cabbage can be eaten; `complete(s)`
+being true means that, in state `s`, the farmer, the wolf, the goat,
+and the cabbage all of them have crossed the river. The identifier
+`ini` represents the initial state. 
+
+For checking the specification, we can use the
+following command:
+
+	sctl -output output.out river.model
+
+and the result will display as below: 
+
+	verifying on the model River_Crossing...
+	find: EU(x,y,safe(x),complete(y),ini)
+	find is true, proof output to "output.out".
 
 ----------
 
@@ -191,103 +310,3 @@ The declaration of sub-modules is optional in an input file.
 
 ----------
 
-# 2 How to Compile the Source Code
-
-1. Install [OCaml](https://ocaml.org/);
-2. Input `make win` (`make linux`) in the windows command line (linux terminal) , or input `make win-opt` (or `make linux-opt` in the linux terminal) if you want a optimized version; 
-3. If option 2 failed, then just copy the corresponding commands in the file `Makefile` and compile the code by hand.
-
-----------
-
-# 3 How to Use The Tool
-We compile the executable files for the platforms of 32(64)-bit Linux, and 32(64)-bit Windows.
-
-For the Linux version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the terminal of the operating system:
-
-	sctl "input_file_name"
-
-and when we want to output the certificates or counterexamples, we enter the following command:
-
-	sctl -output "output_file_name" "input_file_name"
-
-where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
-
-For the Windows version, when we want to perform the verification without output of certificates or counterexamples, we enter the following command in the command line of the operating system:
-
-	sctl.exe "input_file_name"
-
-and when we want to output the certificates or counterexamples, we enter the following command:
-
-	sctl.exe -output "output_file_name" "input_file_name"
-
-where `input_file_name` is the name of the input file, and `output_file_name` is the name of the file containing the certificates or counterexamples.
-
-
-**In practice, running `sctl "input_file_name"` is usually faster than 
-`sctl -output "output_file_name" "input_file_name"`, but not very much.** 
-**So if efficiency is your main concern, use `sctl "input_file_name"` in your verification.**
-
-----------
-
-# 4 An illustrative example
-
-This example concerns the so-called River Crossing Puzzle
-problem.  The question is how can the farmer bring the wolf, the goat,
-and the cabbage get across the river?  We formalize this problem as a
-Kripke model `M` and the question as a specification.  The initial
-state `ini` of model `M` has four components: the initial
-position of the farmer, the wolf, the goat, and the cabbage.  Every
-transition from one state to another corresponds to every move of the
-farmer from one side of the river to another, whether he will carry
-the wolf, the goat, or the cabbage or not.  The specification is that
-if there exists a state `s` can be reachable from `ini`, such
-that in `s`, all of them get on the other side of the river.  the
-farmer, the wolf, the goat, and the cabbage have crossed the river.
-These data compose the input file (`river.model`) as listed below:
-
-	Model River_Crossing()
-	{
-		Var 
-		{
-			farmer:Bool; wolf:Bool; goat:Bool; cabbage:Bool;
-		}
-	 	Init 
-		{
-			farmer:=false; wolf:=false; goat:=false; cabbage:=false;
-		}
-		Transition
-		{ 
-			farmer=wolf:    {wolf:=!wolf;};
-		   	farmer=goat:    {goat:=!goat;};
-		   	farmer=cabbage: {cabbage:=!cabbage;};
-		   	true:           {farmer:=!farmer;};
-		}	
-		Atomic
-		{
-			safe(s):=!(s(wolf)=s(goat)&&s(wolf)!=s(farmer))&&!(s(goat)=s(cabbage)&&s(goat)!= s(farmer));
-		 	complete(s):=s(farmer)=true&&s(wolf)=true && s(goat)=true&&s(cabbage)=true;
-		}
-		Spec
-		{ 
-			find:=EU(x,y,safe(x),complete(y),ini);
-		}
-	}
-
-
-Note that in this input file, two atomic formulae: `safe(s)` and
-`complete(s)` are given.  `safe(s)` being true means that, in state
-`s`, neither the goat nor the cabbage can be eaten; `complete(s)`
-being true means that, in state `s`, the farmer, the wolf, the goat,
-and the cabbage all of them have crossed the river. The identifier
-`ini` represents the initial state. 
-
-For checking the specification, we can use the
-following command:
-
-	sctl -output output.out river.model
-
-and the result will display as below: 
-
-	verifying on the model River_Crossing...
-	find: EU(x,y,safe(x),complete(y),ini)
-	find is true, proof output to "output.out".
