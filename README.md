@@ -21,9 +21,8 @@ This is the implementation of the SCTL system, named SCTLProV. The source code o
 1. Install [OCaml](https://ocaml.org/), [opam](https://opam.ocaml.org/), and install [mlcuddidl](https://opam.ocaml.org/packages/mlcuddidl/) via opam;
 2. Input `make win` (`make linux`) in the windows command line (linux terminal) , or input `make win-opt` (or `make linux-opt` in the linux terminal) if you want a optimized version. 
 3. If option 2 failed, then just copy the corresponding commands in the file `Makefile` and compile the code by hand.
-4. If your installization fails anyway, try to update OCaml into the latest version (4.04.0 for now), and then compile the source code.
+4. If your installization fails anyway, try to update OCaml into the latest version (4.04.0 for now), and then compile the source code following the above steps.
 
-----------
 
 # 3 How to Use The Tool
 
@@ -39,7 +38,6 @@ General Usage:
 So if efficiency is your main concern, do not use the output option.
 When option `-bdd` is specified, SCTLProV usually consumes more time and less memory space than not using `-bdd` option.**
 
-----------
 
 # 4 An illustrative example
 
@@ -234,32 +232,40 @@ By extending CTL with polyadic predicates, SCTL enables us not only to express p
 
 For instance, `"atom1(s1, s2) := (s1(v1) = s2(v2))"` defines an atomic formula `atom1(s1, s2)` such that this formula is true if and only if the assignment of the state variable `v1` at state `s1` equals to the assignment of the state variable `v2` at state `s2`.
 
+## 7.8 Fairness Constraints Declaration
+The fairness constraints are characterized by a list of SCTL formulae.
+
+	fairness_decl :: "Fairness"
+					 "{"
+						formula ";"
+						formula ";"
+						...
+					 "}"
+and
+
+	formula ::
+		     "TRUE"                                ;;Top
+		   | "FALSE"                               ;;Bottom
+		   | iden "(" iden "," iden "," ... ")"    ;;atomic formula
+		   | "not" formula
+		   | formula "/\" formula
+		   | formula "\/" formula
+		   | "AX" "(" iden "," formula "," iden ")"
+		   | "EX" "(" iden "," formula "," iden ")"
+		   | "AF" "(" iden "," formula "," iden ")"
+		   | "EG" "(" iden "," formula "," iden ")"
+		   | "AR" "(" iden "," iden "," formula "," formula "," iden ")"
+		   | "EU" "(" iden "," iden "," formula "," formula "," iden ")"
+		   | "(" formula ")"
+
+
 ## 7.8 Specification Declaration
-The specification of a finite model is characterized by a list of SCTL formulae.
 
 	spec_decl :: "Spec"
 	             "{"
 	               iden ":=" formula ";"
 	               ...
 	             "}"
-
-and 
-
-	formula ::
-	     "TRUE"                                ;;Top
-	   | "FALSE"                               ;;Bottom
-	   | iden "(" iden "," iden "," ... ")"    ;;atomic formula
-	   | "not" formula
-	   | formula "/\" formula
-	   | formula "\/" formula
-	   | "AX" "(" iden "," formula "," iden ")"
-	   | "EX" "(" iden "," formula "," iden ")"
-	   | "AF" "(" iden "," formula "," iden ")"
-	   | "EG" "(" iden "," formula "," iden ")"
-	   | "AR" "(" iden "," iden "," formula "," formula "," iden ")"
-	   | "EU" "(" iden "," iden "," formula "," formula "," iden ")"
-	   | "(" formula ")"
-
 
 
 ## 7.9 Module Declaration
@@ -273,6 +279,7 @@ There are two kinds of module declarations in the language: modules containing t
 	      init_decl
 	      trans_decl
 	      atomic_decl
+		  [fairness_decl]
 	      spec_decl
 	   "}"
 
