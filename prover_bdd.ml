@@ -324,7 +324,7 @@ and prove_fairs cont modl =
 						end
 				end
             | EU (x, y, fml1, fml2, State s) -> 
-            	if State_set.is_empty gamma 
+            	(*if State_set.is_empty gamma 
 					then clear_global_merge levl 
 					else add_to_global_merge gamma levl modl;
 					if in_global_merge s levl modl
@@ -335,9 +335,20 @@ and prove_fairs cont modl =
 					else
 						let next = next s modl.transitions modl.var_index_tbl in
 						let fairs_new = List.map (fun (e, ss) -> if satisfy_fair e s modl then (e, State_set.add s gamma) else (e,ss)) fairs in
-						prove_fairs (generate_EU_cont gamma fairs_new levl x y fml1 fml2 s next contl contr) modl
+						prove_fairs (generate_EU_cont gamma fairs_new levl x y fml1 fml2 s next contl contr) modl*)
+				 (
+					if State_set.is_empty gamma 
+					then clear_global_merge levl 
+					else add_to_global_merge gamma levl modl;
+					if in_global_merge s levl modl
+					then
+						prove_fairs contr modl
+					else
+						let next = next s modl.transitions modl.var_index_tbl in
+						prove_fairs (generate_EU_cont gamma fairs levl x y fml1 fml2 s next contl contr) modl
+				) 
             | AR (x, y, fml1, fml2, State s) ->
-            	(
+            	(*(
             		if State_set.is_empty gamma
 					then clear_global_merge levl
 					else add_to_global_merge gamma levl modl;
@@ -350,7 +361,20 @@ and prove_fairs cont modl =
 				else
 					let next = next s modl.transitions modl.var_index_tbl in
 					let fairs_new = List.map (fun (e, ss) -> if satisfy_fair e s modl then (e, State_set.add s gamma) else (e,ss)) fairs in
-					prove_fairs (generate_AR_cont gamma fairs_new levl x y fml1 fml2 s next contl contr) modl
+					prove_fairs (generate_AR_cont gamma fairs_new levl x y fml1 fml2 s next contl contr) modl*)
+				 (
+					(if State_set.is_empty gamma
+					then clear_global_merge levl
+					else add_to_global_merge gamma levl modl;
+					(*print_endline ("AR merge size: "^(string_of_int (State_set.cardinal (Hashtbl.find merges levl))))*)
+					);		
+					if in_global_merge s levl modl
+					then 
+						prove_fairs contl modl
+					else
+						let next = next s modl.transitions modl.var_index_tbl in
+						prove_fairs (generate_AR_cont gamma fairs levl x y fml1 fml2 s next contl contr) modl
+				) 
 			| _ -> (print_endline ("Unable to prove: "^(fml_to_string fml)); raise Unable_to_prove)
         end
 
