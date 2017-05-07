@@ -1,0 +1,7 @@
+*.cm[ioxa]
+*.o
+*.mli
+lexer.ml
+parser.ml
+sctl
+sctl.exe
