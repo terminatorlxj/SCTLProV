@@ -3,7 +3,7 @@ All programs in the package sctl_ocaml are under the license GPL, version 3.
   1. The BDD library used in this software is CUDD version 3.0.0 (http://vlsi.colorado.edu/~fabio/CUDD/html/index.html);
   2. The OCaml interface to CUDD is MLCuddIDL version 3.0.1 (https://opam.ocaml.org/packages/mlcuddidl/), which is under license LGPL-2.1.
   
-Copyright (c) 2013-2017 Jian Liu (liujian@ios.ac.cn), and Ying Jiang (jy@ios.ac.cn)
+Copyright (c) 2013-2017 Jian Liu (liujian@ios.ac.cn), Ying Jiang (jy@ios.ac.cn), and Kailiang Ji(kailiang.ji2013@gmail.com)
 
 
 
