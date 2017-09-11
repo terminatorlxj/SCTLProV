@@ -108,7 +108,7 @@ The benchmarks are avaliable in [this website](https://github.com/terminatorlxj/
 
 # 6 Visualization
 
-We also wrote an visualization tool for the visualization of proof trees, called VMDV, which is also avaliable in [this website](https://github.com/terminatorlxj/VMDV). The proof tree produced by SCTLProV can be visualized in 3D space by VMDV. Interested readers may refer to the README file of VMDV for further usage information.
+We also wrote an visualization tool for the visualization of proof trees, called VMDV, which is also avaliable in [this website](https://github.com/terminatorlxj/vmdv). The proof tree produced by SCTLProV can be visualized in 3D space by VMDV. Interested readers may refer to the README file of VMDV for further usage information.
 
 # 7 Syntax of input files
 The purpose of the SCTL specification language is to describe a finite state model and the specification to be verified against the model. To define a finite model, one usually needs to define the notion of state, the initial state, and the transitions relation between states. We design our language to be suited to describe these three parts of a finite state model. In addition, in the SCTL system, a notion of atomic formulae is introduced to represent either property of a single state or relations between multiple states. We also can specify this in our language. As for the specification of the finite state model, we use the SCTL formulae, instead of CTL formulae, by extending CTL with polyadic predicate symbols.

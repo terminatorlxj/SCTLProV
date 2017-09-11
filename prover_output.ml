@@ -63,9 +63,10 @@ module Seq_Prover : Prover =
 			| [i] -> string_of_int i
 			| i :: il' -> (string_of_int i)^", "^(str_int_list il')) in
 		let rec str_sequent seqt = 
-			(let gamma = fst seqt and fml = snd seqt in
-			 let str_gamma = (State_set.fold (fun a b -> (str_modl_state vt a)^"\r\n"^b) gamma "") in
-				(if str_gamma = "" then "" else str_gamma^"") ^"|- "^(str_modl_fml vt fml)) in
+			(let gamma = fst seqt 
+			and fml = snd seqt in
+			let str_gamma = (State_set.fold (fun a b -> (str_modl_state vt a)^"\r\n"^b) gamma "") in
+				(if str_gamma = "" then "" else str_gamma^"") ^"|- "^(str_modl_fml vt (if b then fml else nnf (Neg fml)))) in
 		let rec output_tmp_queue () = 
 			if (List.length !tmp_queue > 0) then 
 				(let h = List.hd !tmp_queue in 

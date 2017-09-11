@@ -521,7 +521,7 @@ let rec str_modl_fml vt fml =
 	| Top -> "TRUE"
 	| Bottom -> "FALSE"
 	| Atomic (e, sl) -> (e) ^ "("^ (str_modl_state_or_var_list vt sl) ^")"
-	| Neg fml1 -> "(not " ^ (fml_to_string fml1) ^ ")"
+	| Neg fml1 -> "(not " ^ (str_modl_fml vt fml1) ^ ")"
 	| And (fml1, fml2) -> (fml_to_string fml1) ^ "/\\" ^ (fml_to_string fml2)
 	| Or (fml1, fml2) -> (fml_to_string fml1) ^ "\\/" ^ (fml_to_string fml2)
 	| AX (s, fml1, s') -> "AX(" ^ (str_state s) ^ ", (" ^ (fml_to_string fml1) ^ "), " ^ (str_modl_state_or_var vt s') ^ ")"

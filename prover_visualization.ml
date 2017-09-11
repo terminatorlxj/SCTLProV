@@ -225,7 +225,7 @@ let send_proof_tree id vt =
 	Hashtbl.iter (fun a b -> add_node id (string_of_int a) (str_sequent b) "Proved") sequents;*)
 	let rec str_sequent seqt = 
 		(let gamma = fst seqt and fml = snd seqt in
-			let str_gamma = (State_set.fold (fun a b -> (str_modl_state vt a)^"\r\n"^b) gamma "") in
+			let str_gamma = (State_set.fold (fun a b -> (str_modl_state vt a)^" "^b) gamma "") in
 			(if str_gamma = "" then "" else str_gamma^"") ^"|- "^(str_modl_fml vt fml)) in
 	let tmp_fmls = ref [0] in
 	while !tmp_fmls <> [] do
@@ -299,7 +299,7 @@ let rec prove_model modl visualize_addr =
 			let init_state_id = new_state_id() in
 			Hashtbl.add state_tbl modl.init_assign init_state_id;
 			Hashtbl.add state_struct_tbl init_state_id [];
-			let b = (prove (Cont (State_set.empty, Formula.subst_s (nnf_fml) (SVar "ini") (State modl.init_assign), 0, "1", (fun () -> Basic true), (fun () -> Basic false))) modl) in
+			print_endline (s^": "^(string_of_bool (prove (Cont (State_set.empty, Formula.subst_s (nnf_fml) (SVar "ini") (State modl.init_assign), 0, "1", (fun () -> Basic true), (fun () -> Basic false))) modl)));
 				(*print_endline (s ^ " is " ^ (if b then "true, proof output to \""^outname^"\"." else "false, counterexample output to \""^outname^"\".")); *)
 				(*output_result b s sequents (if b then proof else counterexample) out modl.var_list; 
 				output_string out "***********************************ouput complete**************************************";

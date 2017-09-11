@@ -16,8 +16,8 @@ Model River_Crossing()
 	{
 		farmer := false;
 		wolf := false; 
-		goat := false;
-		cabbage := false;
+		goat := true;
+		cabbage := true;
 	}
 	
 	Transition
