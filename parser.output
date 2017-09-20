@@ -62,99 +62,116 @@
   50              | Id LB2 dexp RB2 Dot Id LB2 dexp RB2
   51              | Id Dot dnested_var
   52              | Id LB2 dexp RB2 Dot dnested_var
-  53              | LB1 dnested_var RB1
 
-  54  init_decl : Init LB3 inis RB3
+  53  init_decl : Init LB3 inis RB3
 
-  55  inis :
-  56       | Id Assigno exp Semicolon inis
-  57       | Id Assigno LB3 exps RB3 Semicolon inis
+  54  inis :
+  55       | Id Assigno exp Semicolon inis
+  56       | Id Assigno LB3 exps RB3 Semicolon inis
+  57       | Id Assigno LB3 exp RB3 Semicolon inis
   58       | Id Assigno Id LB1 exps RB1 Semicolon inis
+  59       | Id Assigno Id LB1 exp RB1 Semicolon inis
+  60       | Id Assigno Id LB1 RB1 Semicolon inis
 
-  59  exps :
-  60       | exp
-  61       | exp Comma exps
+  61  exps : exp Comma exp
+  62       | exp Comma exps
 
-  62  exp : I
-  63      | B
-  64      | Id
-  65      | Id LB2 exp RB2
-  66      | Id LB1 exp RB1
-  67      | nested_var
-  68      | Scalar Id
-  69      | Minus exp
-  70      | Nego exp
-  71      | exp Equal exp
-  72      | exp Non_equal exp
-  73      | exp Ando exp
-  74      | exp Oro exp
-  75      | exp Add exp
-  76      | exp Minus exp
-  77      | exp Mult exp
-  78      | exp Mod exp
-  79      | exp LT exp
-  80      | exp GT exp
-  81      | exp LE exp
-  82      | exp GE exp
-  83      | LB1 exp RB1
+  63  state_expr : Id LB1 exp RB1
+  64             | Minus state_expr
+  65             | Nego state_expr
+  66             | state_expr Equal state_expr
+  67             | state_expr Non_equal state_expr
+  68             | state_expr Ando state_expr
+  69             | state_expr Oro state_expr
+  70             | state_expr Add state_expr
+  71             | state_expr Minus state_expr
+  72             | state_expr Mult state_expr
+  73             | state_expr Mod state_expr
+  74             | state_expr LT state_expr
+  75             | state_expr GT state_expr
+  76             | state_expr LE state_expr
+  77             | state_expr GE state_expr
+  78             | LB1 state_expr RB1
 
-  84  nested_var : Id Dot Id
-  85             | Id LB2 exp RB2 Dot Id
-  86             | Id Dot Id LB2 exp RB2
-  87             | Id LB2 exp RB2 Dot Id LB2 exp RB2
-  88             | Id Dot nested_var
-  89             | Id LB2 exp RB2 Dot nested_var
+  79  exp : I
+  80      | B
+  81      | Id
+  82      | Id LB2 exp RB2
+  83      | nested_var
+  84      | Scalar Id
+  85      | Minus exp
+  86      | Nego exp
+  87      | exp Equal exp
+  88      | exp Non_equal exp
+  89      | exp Ando exp
+  90      | exp Oro exp
+  91      | exp Add exp
+  92      | exp Minus exp
+  93      | exp Mult exp
+  94      | exp Mod exp
+  95      | exp LT exp
+  96      | exp GT exp
+  97      | exp LE exp
+  98      | exp GE exp
+  99      | LB1 exp RB1
 
-  90  trans_decl : Transition LB3 trans RB3
+ 100  nested_var : Id Dot Id
+ 101             | Id LB2 exp RB2 Dot Id
+ 102             | Id Dot Id LB2 exp RB2
+ 103             | Id LB2 exp RB2 Dot Id LB2 exp RB2
+ 104             | Id Dot nested_var
+ 105             | Id LB2 exp RB2 Dot nested_var
 
-  91  trans :
-  92        | exp Colon LB3 rests RB3 Semicolon trans
+ 106  trans_decl : Transition LB3 trans RB3
 
-  93  rests :
-  94        | Id Assigno exp Semicolon rests
-  95        | Id LB2 exp RB2 Assigno exp Semicolon rests
+ 107  trans :
+ 108        | exp Colon LB3 rests RB3 Semicolon trans
 
-  96  fairness_decl : Fairness LB3 fairness RB3
+ 109  rests :
+ 110        | Id Assigno exp Semicolon rests
+ 111        | Id LB2 exp RB2 Assigno exp Semicolon rests
 
-  97  fairness :
-  98           | Id LB1 Id RB1 Semicolon fairness
-  99           | fml Semicolon fairness
+ 112  fairness_decl : Fairness LB3 fairness RB3
 
- 100  atomic_decl : Atomic LB3 atomics RB3
+ 113  fairness :
+ 114           | fml Semicolon fairness
 
- 101  atomics :
- 102          | atomics Id LB1 bound_var RB1 Assigno exp Semicolon
+ 115  atomic_decl : Atomic LB3 atomics RB3
 
- 103  bound_var : bound_vars
+ 116  atomics :
+ 117          | atomics Id LB1 bound_var RB1 Assigno state_expr Semicolon
 
- 104  bound_vars :
- 105             | Id
- 106             | Id Comma bound_vars
+ 118  bound_var : bound_vars
 
- 107  spec_decl : Spec LB3 specs RB3
+ 119  bound_vars :
+ 120             | Id
+ 121             | Id Comma bound_vars
 
- 108  specs :
- 109        | Id Assigno fml Semicolon specs
+ 122  spec_decl : Spec LB3 specs RB3
 
- 110  fml : Top
- 111      | Bottom
- 112      | Id LB1 atom_fml_para RB1
- 113      | Neg fml
- 114      | fml And fml
- 115      | fml Or fml
- 116      | AX LB1 Id Comma fml Comma Id RB1
- 117      | EX LB1 Id Comma fml Comma Id RB1
- 118      | AF LB1 Id Comma fml Comma Id RB1
- 119      | EG LB1 Id Comma fml Comma Id RB1
- 120      | AR LB1 Id Comma Id Comma fml Comma fml Comma Id RB1
- 121      | EU LB1 Id Comma Id Comma fml Comma fml Comma Id RB1
- 122      | LB1 fml RB1
+ 123  specs :
+ 124        | Id Assigno fml Semicolon specs
 
- 123  atom_fml_para :
- 124                | Id
- 125                | Id Comma atom_fml_para
+ 125  fml : Top
+ 126      | Bottom
+ 127      | Id LB1 atom_fml_para RB1
+ 128      | Id LB1 RB1
+ 129      | Id LB1 Id RB1
+ 130      | Neg fml
+ 131      | fml And fml
+ 132      | fml Or fml
+ 133      | AX LB1 Id Comma fml Comma Id RB1
+ 134      | EX LB1 Id Comma fml Comma Id RB1
+ 135      | AF LB1 Id Comma fml Comma Id RB1
+ 136      | EG LB1 Id Comma fml Comma Id RB1
+ 137      | AR LB1 Id Comma Id Comma fml Comma fml Comma Id RB1
+ 138      | EU LB1 Id Comma Id Comma fml Comma fml Comma Id RB1
+ 139      | LB1 fml RB1
 
- 126  %entry% : '\001' input
+ 140  atom_fml_para : Id Comma Id
+ 141                | Id Comma atom_fml_para
+
+ 142  %entry% : '\001' input
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -166,7 +183,7 @@ state 0
 
 
 state 1
-	%entry% : '\001' . input  (126)
+	%entry% : '\001' . input  (142)
 	inputs : .  (2)
 
 	.  reduce 2
@@ -182,9 +199,9 @@ state 2
 
 
 state 3
-	%entry% : '\001' input .  (126)
+	%entry% : '\001' input .  (142)
 
-	.  reduce 126
+	.  reduce 142
 
 
 state 4
@@ -494,7 +511,7 @@ state 37
 
 
 state 38
-	init_decl : Init . LB3 inis RB3  (54)
+	init_decl : Init . LB3 inis RB3  (53)
 
 	LB3  shift 48
 	.  error
@@ -580,17 +597,17 @@ state 47
 
 
 state 48
-	init_decl : Init LB3 . inis RB3  (54)
-	inis : .  (55)
+	init_decl : Init LB3 . inis RB3  (53)
+	inis : .  (54)
 
 	Id  shift 59
-	RB3  reduce 55
+	RB3  reduce 54
 
 	inis  goto 60
 
 
 state 49
-	trans_decl : Transition . LB3 trans RB3  (90)
+	trans_decl : Transition . LB3 trans RB3  (106)
 
 	LB3  shift 61
 	.  error
@@ -673,24 +690,27 @@ state 58
 
 
 state 59
-	inis : Id . Assigno exp Semicolon inis  (56)
-	inis : Id . Assigno LB3 exps RB3 Semicolon inis  (57)
+	inis : Id . Assigno exp Semicolon inis  (55)
+	inis : Id . Assigno LB3 exps RB3 Semicolon inis  (56)
+	inis : Id . Assigno LB3 exp RB3 Semicolon inis  (57)
 	inis : Id . Assigno Id LB1 exps RB1 Semicolon inis  (58)
+	inis : Id . Assigno Id LB1 exp RB1 Semicolon inis  (59)
+	inis : Id . Assigno Id LB1 RB1 Semicolon inis  (60)
 
 	Assigno  shift 70
 	.  error
 
 
 state 60
-	init_decl : Init LB3 inis . RB3  (54)
+	init_decl : Init LB3 inis . RB3  (53)
 
 	RB3  shift 71
 	.  error
 
 
 state 61
-	trans_decl : Transition LB3 . trans RB3  (90)
-	trans : .  (91)
+	trans_decl : Transition LB3 . trans RB3  (106)
+	trans : .  (107)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -699,7 +719,7 @@ state 61
 	Id  shift 76
 	I  shift 77
 	B  shift 78
-	RB3  reduce 91
+	RB3  reduce 107
 
 	exp  goto 79
 	nested_var  goto 80
@@ -720,7 +740,7 @@ state 63
 
 
 state 64
-	atomic_decl : Atomic . LB3 atomics RB3  (100)
+	atomic_decl : Atomic . LB3 atomics RB3  (115)
 
 	LB3  shift 83
 	.  error
@@ -771,9 +791,12 @@ state 69
 
 
 state 70
-	inis : Id Assigno . exp Semicolon inis  (56)
-	inis : Id Assigno . LB3 exps RB3 Semicolon inis  (57)
+	inis : Id Assigno . exp Semicolon inis  (55)
+	inis : Id Assigno . LB3 exps RB3 Semicolon inis  (56)
+	inis : Id Assigno . LB3 exp RB3 Semicolon inis  (57)
 	inis : Id Assigno . Id LB1 exps RB1 Semicolon inis  (58)
+	inis : Id Assigno . Id LB1 exp RB1 Semicolon inis  (59)
+	inis : Id Assigno . Id LB1 RB1 Semicolon inis  (60)
 
 	LB1  shift 72
 	LB3  shift 92
@@ -790,13 +813,13 @@ state 70
 
 
 state 71
-	init_decl : Init LB3 inis RB3 .  (54)
+	init_decl : Init LB3 inis RB3 .  (53)
 
-	.  reduce 54
+	.  reduce 53
 
 
 state 72
-	exp : LB1 . exp RB1  (83)
+	exp : LB1 . exp RB1  (99)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -812,7 +835,7 @@ state 72
 
 
 state 73
-	exp : Minus . exp  (69)
+	exp : Minus . exp  (85)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -828,14 +851,14 @@ state 73
 
 
 state 74
-	exp : Scalar . Id  (68)
+	exp : Scalar . Id  (84)
 
 	Id  shift 97
 	.  error
 
 
 state 75
-	exp : Nego . exp  (70)
+	exp : Nego . exp  (86)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -851,92 +874,90 @@ state 75
 
 
 state 76
-	exp : Id .  (64)
-	exp : Id . LB2 exp RB2  (65)
-	exp : Id . LB1 exp RB1  (66)
-	nested_var : Id . Dot Id  (84)
-	nested_var : Id . LB2 exp RB2 Dot Id  (85)
-	nested_var : Id . Dot Id LB2 exp RB2  (86)
-	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id . Dot nested_var  (88)
-	nested_var : Id . LB2 exp RB2 Dot nested_var  (89)
+	exp : Id .  (81)
+	exp : Id . LB2 exp RB2  (82)
+	nested_var : Id . Dot Id  (100)
+	nested_var : Id . LB2 exp RB2 Dot Id  (101)
+	nested_var : Id . Dot Id LB2 exp RB2  (102)
+	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id . Dot nested_var  (104)
+	nested_var : Id . LB2 exp RB2 Dot nested_var  (105)
 
 	Dot  shift 99
-	LB1  shift 100
-	LB2  shift 101
-	Colon  reduce 64
-	Semicolon  reduce 64
-	Comma  reduce 64
-	RB1  reduce 64
-	RB2  reduce 64
-	RB3  reduce 64
-	Equal  reduce 64
-	Add  reduce 64
-	Minus  reduce 64
-	Mult  reduce 64
-	Ando  reduce 64
-	Oro  reduce 64
-	Non_equal  reduce 64
-	Mod  reduce 64
-	LT  reduce 64
-	GT  reduce 64
-	LE  reduce 64
-	GE  reduce 64
+	LB2  shift 100
+	Colon  reduce 81
+	Semicolon  reduce 81
+	Comma  reduce 81
+	RB1  reduce 81
+	RB2  reduce 81
+	RB3  reduce 81
+	Equal  reduce 81
+	Add  reduce 81
+	Minus  reduce 81
+	Mult  reduce 81
+	Ando  reduce 81
+	Oro  reduce 81
+	Non_equal  reduce 81
+	Mod  reduce 81
+	LT  reduce 81
+	GT  reduce 81
+	LE  reduce 81
+	GE  reduce 81
 
 
 state 77
-	exp : I .  (62)
+	exp : I .  (79)
 
-	.  reduce 62
+	.  reduce 79
 
 
 state 78
-	exp : B .  (63)
+	exp : B .  (80)
 
-	.  reduce 63
+	.  reduce 80
 
 
 state 79
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	trans : exp . Colon LB3 rests RB3 Semicolon trans  (92)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	trans : exp . Colon LB3 rests RB3 Semicolon trans  (108)
 
-	Colon  shift 102
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Colon  shift 101
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 80
-	exp : nested_var .  (67)
+	exp : nested_var .  (83)
 
-	.  reduce 67
+	.  reduce 83
 
 
 state 81
-	trans_decl : Transition LB3 trans . RB3  (90)
+	trans_decl : Transition LB3 trans . RB3  (106)
 
-	RB3  shift 115
+	RB3  shift 114
 	.  error
 
 
@@ -947,32 +968,32 @@ state 82
 
 
 state 83
-	atomic_decl : Atomic LB3 . atomics RB3  (100)
-	atomics : .  (101)
+	atomic_decl : Atomic LB3 . atomics RB3  (115)
+	atomics : .  (116)
 
-	.  reduce 101
+	.  reduce 116
 
-	atomics  goto 116
+	atomics  goto 115
 
 
 state 84
-	fairness_decl : Fairness . LB3 fairness RB3  (96)
+	fairness_decl : Fairness . LB3 fairness RB3  (112)
 
-	LB3  shift 117
+	LB3  shift 116
 	.  error
 
 
 state 85
-	spec_decl : Spec . LB3 specs RB3  (107)
+	spec_decl : Spec . LB3 specs RB3  (122)
 
-	LB3  shift 118
+	LB3  shift 117
 	.  error
 
 
 state 86
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl init_decl trans_decl atomic_decl spec_decl . RB3  (5)
 
-	RB3  shift 119
+	RB3  shift 118
 	.  error
 
 
@@ -982,7 +1003,7 @@ state 87
 	Spec  shift 85
 	.  error
 
-	spec_decl  goto 120
+	spec_decl  goto 119
 
 
 state 88
@@ -993,8 +1014,8 @@ state 88
 	Spec  shift 85
 	.  error
 
-	spec_decl  goto 121
-	fairness_decl  goto 122
+	spec_decl  goto 120
+	fairness_decl  goto 121
 
 
 state 89
@@ -1004,7 +1025,7 @@ state 89
 	Id  shift 45
 	RB3  reduce 20
 
-	vars  goto 123
+	vars  goto 122
 
 
 state 90
@@ -1019,29 +1040,29 @@ state 90
 	B  shift 78
 	.  error
 
-	exp  goto 124
+	exp  goto 123
 	nested_var  goto 80
 
 
 state 91
 	symbols : symbols Id Assigno . dexp Semicolon  (25)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 132
-	dnested_var  goto 133
+	dexp  goto 131
+	dnested_var  goto 132
 
 
 state 92
-	inis : Id Assigno LB3 . exps RB3 Semicolon inis  (57)
-	exps : .  (59)
+	inis : Id Assigno LB3 . exps RB3 Semicolon inis  (56)
+	inis : Id Assigno LB3 . exp RB3 Semicolon inis  (57)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1050,177 +1071,181 @@ state 92
 	Id  shift 76
 	I  shift 77
 	B  shift 78
-	RB3  reduce 59
+	.  error
 
-	exp  goto 134
-	exps  goto 135
+	exp  goto 133
+	exps  goto 134
 	nested_var  goto 80
 
 
 state 93
 	inis : Id Assigno Id . LB1 exps RB1 Semicolon inis  (58)
-	exp : Id .  (64)
-	exp : Id . LB2 exp RB2  (65)
-	exp : Id . LB1 exp RB1  (66)
-	nested_var : Id . Dot Id  (84)
-	nested_var : Id . LB2 exp RB2 Dot Id  (85)
-	nested_var : Id . Dot Id LB2 exp RB2  (86)
-	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id . Dot nested_var  (88)
-	nested_var : Id . LB2 exp RB2 Dot nested_var  (89)
+	inis : Id Assigno Id . LB1 exp RB1 Semicolon inis  (59)
+	inis : Id Assigno Id . LB1 RB1 Semicolon inis  (60)
+	exp : Id .  (81)
+	exp : Id . LB2 exp RB2  (82)
+	nested_var : Id . Dot Id  (100)
+	nested_var : Id . LB2 exp RB2 Dot Id  (101)
+	nested_var : Id . Dot Id LB2 exp RB2  (102)
+	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id . Dot nested_var  (104)
+	nested_var : Id . LB2 exp RB2 Dot nested_var  (105)
 
 	Dot  shift 99
-	LB1  shift 136
-	LB2  shift 101
-	Semicolon  reduce 64
-	Equal  reduce 64
-	Add  reduce 64
-	Minus  reduce 64
-	Mult  reduce 64
-	Ando  reduce 64
-	Oro  reduce 64
-	Non_equal  reduce 64
-	Mod  reduce 64
-	LT  reduce 64
-	GT  reduce 64
-	LE  reduce 64
-	GE  reduce 64
+	LB1  shift 135
+	LB2  shift 100
+	Semicolon  reduce 81
+	Equal  reduce 81
+	Add  reduce 81
+	Minus  reduce 81
+	Mult  reduce 81
+	Ando  reduce 81
+	Oro  reduce 81
+	Non_equal  reduce 81
+	Mod  reduce 81
+	LT  reduce 81
+	GT  reduce 81
+	LE  reduce 81
+	GE  reduce 81
 
 
 state 94
-	inis : Id Assigno exp . Semicolon inis  (56)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	inis : Id Assigno exp . Semicolon inis  (55)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	Semicolon  shift 137
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Semicolon  shift 136
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 95
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	exp : LB1 exp . RB1  (83)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	exp : LB1 exp . RB1  (99)
 
-	RB1  shift 138
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	RB1  shift 137
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 96
-	exp : Minus exp .  (69)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : Minus exp .  (85)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	Equal  shift 103
-	Mult  shift 106
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 69
-	Semicolon  reduce 69
-	Comma  reduce 69
-	RB1  reduce 69
-	RB2  reduce 69
-	RB3  reduce 69
-	Add  reduce 69
-	Minus  reduce 69
-	Ando  reduce 69
-	Oro  reduce 69
+	Equal  shift 102
+	Mult  shift 105
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 85
+	Semicolon  reduce 85
+	Comma  reduce 85
+	RB1  reduce 85
+	RB2  reduce 85
+	RB3  reduce 85
+	Add  reduce 85
+	Minus  reduce 85
+	Ando  reduce 85
+	Oro  reduce 85
 
 
 state 97
-	exp : Scalar Id .  (68)
+	exp : Scalar Id .  (84)
 
-	.  reduce 68
+	.  reduce 84
 
 
 state 98
-	exp : Nego exp .  (70)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : Nego exp .  (86)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 70
+	.  reduce 86
 
 
 state 99
-	nested_var : Id Dot . Id  (84)
-	nested_var : Id Dot . Id LB2 exp RB2  (86)
-	nested_var : Id Dot . nested_var  (88)
+	nested_var : Id Dot . Id  (100)
+	nested_var : Id Dot . Id LB2 exp RB2  (102)
+	nested_var : Id Dot . nested_var  (104)
 
-	Id  shift 139
+	Id  shift 138
 	.  error
 
-	nested_var  goto 140
+	nested_var  goto 139
 
 
 state 100
-	exp : Id LB1 . exp RB1  (66)
+	exp : Id LB2 . exp RB2  (82)
+	nested_var : Id LB2 . exp RB2 Dot Id  (101)
+	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 . exp RB2 Dot nested_var  (105)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1231,15 +1256,19 @@ state 100
 	B  shift 78
 	.  error
 
-	exp  goto 141
+	exp  goto 140
 	nested_var  goto 80
 
 
 state 101
-	exp : Id LB2 . exp RB2  (65)
-	nested_var : Id LB2 . exp RB2 Dot Id  (85)
-	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 . exp RB2 Dot nested_var  (89)
+	trans : exp Colon . LB3 rests RB3 Semicolon trans  (108)
+
+	LB3  shift 141
+	.  error
+
+
+state 102
+	exp : exp Equal . exp  (87)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1254,15 +1283,24 @@ state 101
 	nested_var  goto 80
 
 
-state 102
-	trans : exp Colon . LB3 rests RB3 Semicolon trans  (92)
+state 103
+	exp : exp Add . exp  (91)
 
-	LB3  shift 143
+	LB1  shift 72
+	Minus  shift 73
+	Scalar  shift 74
+	Nego  shift 75
+	Id  shift 76
+	I  shift 77
+	B  shift 78
 	.  error
 
+	exp  goto 143
+	nested_var  goto 80
 
-state 103
-	exp : exp Equal . exp  (71)
+
+state 104
+	exp : exp Minus . exp  (92)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1277,8 +1315,8 @@ state 103
 	nested_var  goto 80
 
 
-state 104
-	exp : exp Add . exp  (75)
+state 105
+	exp : exp Mult . exp  (93)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1293,8 +1331,8 @@ state 104
 	nested_var  goto 80
 
 
-state 105
-	exp : exp Minus . exp  (76)
+state 106
+	exp : exp Ando . exp  (89)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1309,8 +1347,8 @@ state 105
 	nested_var  goto 80
 
 
-state 106
-	exp : exp Mult . exp  (77)
+state 107
+	exp : exp Oro . exp  (90)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1325,8 +1363,8 @@ state 106
 	nested_var  goto 80
 
 
-state 107
-	exp : exp Ando . exp  (73)
+state 108
+	exp : exp Non_equal . exp  (88)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1341,8 +1379,8 @@ state 107
 	nested_var  goto 80
 
 
-state 108
-	exp : exp Oro . exp  (74)
+state 109
+	exp : exp Mod . exp  (94)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1357,8 +1395,8 @@ state 108
 	nested_var  goto 80
 
 
-state 109
-	exp : exp Non_equal . exp  (72)
+state 110
+	exp : exp LT . exp  (95)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1373,8 +1411,8 @@ state 109
 	nested_var  goto 80
 
 
-state 110
-	exp : exp Mod . exp  (78)
+state 111
+	exp : exp GT . exp  (96)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1389,8 +1427,8 @@ state 110
 	nested_var  goto 80
 
 
-state 111
-	exp : exp LT . exp  (79)
+state 112
+	exp : exp LE . exp  (97)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1405,8 +1443,8 @@ state 111
 	nested_var  goto 80
 
 
-state 112
-	exp : exp GT . exp  (80)
+state 113
+	exp : exp GE . exp  (98)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -1421,207 +1459,174 @@ state 112
 	nested_var  goto 80
 
 
-state 113
-	exp : exp LE . exp  (81)
-
-	LB1  shift 72
-	Minus  shift 73
-	Scalar  shift 74
-	Nego  shift 75
-	Id  shift 76
-	I  shift 77
-	B  shift 78
-	.  error
-
-	exp  goto 154
-	nested_var  goto 80
-
-
 state 114
-	exp : exp GE . exp  (82)
+	trans_decl : Transition LB3 trans RB3 .  (106)
 
-	LB1  shift 72
-	Minus  shift 73
-	Scalar  shift 74
-	Nego  shift 75
-	Id  shift 76
-	I  shift 77
-	B  shift 78
-	.  error
-
-	exp  goto 155
-	nested_var  goto 80
+	.  reduce 106
 
 
 state 115
-	trans_decl : Transition LB3 trans RB3 .  (90)
+	atomic_decl : Atomic LB3 atomics . RB3  (115)
+	atomics : atomics . Id LB1 bound_var RB1 Assigno state_expr Semicolon  (117)
 
-	.  reduce 90
-
-
-state 116
-	atomic_decl : Atomic LB3 atomics . RB3  (100)
-	atomics : atomics . Id LB1 bound_var RB1 Assigno exp Semicolon  (102)
-
-	RB3  shift 156
-	Id  shift 157
+	RB3  shift 154
+	Id  shift 155
 	.  error
 
 
+state 116
+	fairness_decl : Fairness LB3 . fairness RB3  (112)
+	fairness : .  (113)
+
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	RB3  reduce 113
+
+	fairness  goto 167
+	fml  goto 168
+
+
 state 117
-	fairness_decl : Fairness LB3 . fairness RB3  (96)
-	fairness : .  (97)
+	spec_decl : Spec LB3 . specs RB3  (122)
+	specs : .  (123)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 168
-	RB3  reduce 97
+	Id  shift 169
+	RB3  reduce 123
 
-	fairness  goto 169
-	fml  goto 170
+	specs  goto 170
 
 
 state 118
-	spec_decl : Spec LB3 . specs RB3  (107)
-	specs : .  (108)
-
-	Id  shift 171
-	RB3  reduce 108
-
-	specs  goto 172
-
-
-state 119
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl init_decl trans_decl atomic_decl spec_decl RB3 .  (5)
 
 	.  reduce 5
 
 
-state 120
+state 119
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl init_decl trans_decl atomic_decl fairness_decl spec_decl . RB3  (7)
 
-	RB3  shift 173
+	RB3  shift 171
+	.  error
+
+
+state 120
+	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl spec_decl . RB3  (6)
+
+	RB3  shift 172
 	.  error
 
 
 state 121
-	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl spec_decl . RB3  (6)
-
-	RB3  shift 174
-	.  error
-
-
-state 122
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl fairness_decl . spec_decl RB3  (8)
 
 	Spec  shift 85
 	.  error
 
-	spec_decl  goto 175
+	spec_decl  goto 173
 
 
-state 123
+state 122
 	vars : Id Colon expr_type Semicolon vars .  (21)
 
 	.  reduce 21
 
 
-state 124
+state 123
 	vars : Id Colon expr_type LB2 exp . RB2 Semicolon vars  (22)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	RB2  shift 176
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	RB2  shift 174
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
+
+
+state 124
+	dexp : LB1 . dexp RB1  (46)
+
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
+	.  error
+
+	dexp  goto 175
+	dnested_var  goto 132
 
 
 state 125
-	dexp : LB1 . dexp RB1  (46)
-	dnested_var : LB1 . dnested_var RB1  (53)
+	dexp : Minus . dexp  (32)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 177
-	dnested_var  goto 178
+	dexp  goto 176
+	dnested_var  goto 132
 
 
 state 126
-	dexp : Minus . dexp  (32)
+	dexp : Scalar . Id  (31)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	Id  shift 177
 	.  error
-
-	dexp  goto 179
-	dnested_var  goto 133
 
 
 state 127
-	dexp : Scalar . Id  (31)
+	dexp : Nego . dexp  (33)
 
-	Id  shift 180
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
+
+	dexp  goto 178
+	dnested_var  goto 132
 
 
 state 128
-	dexp : Nego . dexp  (33)
-
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
-	.  error
-
-	dexp  goto 181
-	dnested_var  goto 133
-
-
-state 129
 	dexp : Id .  (28)
 	dexp : Id . LB2 dexp RB2  (29)
 	dnested_var : Id . Dot Id  (47)
@@ -1631,8 +1636,8 @@ state 129
 	dnested_var : Id . Dot dnested_var  (51)
 	dnested_var : Id . LB2 dexp RB2 Dot dnested_var  (52)
 
-	Dot  shift 182
-	LB2  shift 183
+	Dot  shift 179
+	LB2  shift 180
 	Semicolon  reduce 28
 	RB1  reduce 28
 	RB2  reduce 28
@@ -1650,19 +1655,19 @@ state 129
 	GE  reduce 28
 
 
-state 130
+state 129
 	dexp : I .  (26)
 
 	.  reduce 26
 
 
-state 131
+state 130
 	dexp : B .  (27)
 
 	.  reduce 27
 
 
-state 132
+state 131
 	symbols : symbols Id Assigno dexp . Semicolon  (25)
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
@@ -1677,689 +1682,661 @@ state 132
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Semicolon  shift 184
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Semicolon  shift 181
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Oro  shift 187
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	.  error
 
 
-state 133
+state 132
 	dexp : dnested_var .  (30)
 
 	.  reduce 30
 
 
-state 134
-	exps : exp .  (60)
-	exps : exp . Comma exps  (61)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+state 133
+	inis : Id Assigno LB3 exp . RB3 Semicolon inis  (57)
+	exps : exp . Comma exp  (61)
+	exps : exp . Comma exps  (62)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	Comma  shift 197
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	RB1  reduce 60
-	RB3  reduce 60
-
-
-state 135
-	inis : Id Assigno LB3 exps . RB3 Semicolon inis  (57)
-
-	RB3  shift 198
+	Comma  shift 194
+	RB3  shift 195
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
-state 136
+state 134
+	inis : Id Assigno LB3 exps . RB3 Semicolon inis  (56)
+
+	RB3  shift 196
+	.  error
+
+
+state 135
 	inis : Id Assigno Id LB1 . exps RB1 Semicolon inis  (58)
-	exp : Id LB1 . exp RB1  (66)
-	exps : .  (59)
+	inis : Id Assigno Id LB1 . exp RB1 Semicolon inis  (59)
+	inis : Id Assigno Id LB1 . RB1 Semicolon inis  (60)
 
 	LB1  shift 72
+	RB1  shift 197
 	Minus  shift 73
 	Scalar  shift 74
 	Nego  shift 75
 	Id  shift 76
 	I  shift 77
 	B  shift 78
-	RB1  reduce 59
+	.  error
 
-	exp  goto 199
-	exps  goto 200
+	exp  goto 198
+	exps  goto 199
 	nested_var  goto 80
 
 
-state 137
-	inis : Id Assigno exp Semicolon . inis  (56)
-	inis : .  (55)
+state 136
+	inis : Id Assigno exp Semicolon . inis  (55)
+	inis : .  (54)
 
 	Id  shift 59
-	RB3  reduce 55
+	RB3  reduce 54
 
-	inis  goto 201
+	inis  goto 200
+
+
+state 137
+	exp : LB1 exp RB1 .  (99)
+
+	.  reduce 99
 
 
 state 138
-	exp : LB1 exp RB1 .  (83)
+	nested_var : Id . Dot Id  (100)
+	nested_var : Id Dot Id .  (100)
+	nested_var : Id . LB2 exp RB2 Dot Id  (101)
+	nested_var : Id . Dot Id LB2 exp RB2  (102)
+	nested_var : Id Dot Id . LB2 exp RB2  (102)
+	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id . Dot nested_var  (104)
+	nested_var : Id . LB2 exp RB2 Dot nested_var  (105)
 
-	.  reduce 83
+	Dot  shift 99
+	LB2  shift 201
+	Colon  reduce 100
+	Semicolon  reduce 100
+	Comma  reduce 100
+	RB1  reduce 100
+	RB2  reduce 100
+	RB3  reduce 100
+	Equal  reduce 100
+	Add  reduce 100
+	Minus  reduce 100
+	Mult  reduce 100
+	Ando  reduce 100
+	Oro  reduce 100
+	Non_equal  reduce 100
+	Mod  reduce 100
+	LT  reduce 100
+	GT  reduce 100
+	LE  reduce 100
+	GE  reduce 100
 
 
 state 139
-	nested_var : Id . Dot Id  (84)
-	nested_var : Id Dot Id .  (84)
-	nested_var : Id . LB2 exp RB2 Dot Id  (85)
-	nested_var : Id . Dot Id LB2 exp RB2  (86)
-	nested_var : Id Dot Id . LB2 exp RB2  (86)
-	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id . Dot nested_var  (88)
-	nested_var : Id . LB2 exp RB2 Dot nested_var  (89)
+	nested_var : Id Dot nested_var .  (104)
 
-	Dot  shift 99
-	LB2  shift 202
-	Colon  reduce 84
-	Semicolon  reduce 84
-	Comma  reduce 84
-	RB1  reduce 84
-	RB2  reduce 84
-	RB3  reduce 84
-	Equal  reduce 84
-	Add  reduce 84
-	Minus  reduce 84
-	Mult  reduce 84
-	Ando  reduce 84
-	Oro  reduce 84
-	Non_equal  reduce 84
-	Mod  reduce 84
-	LT  reduce 84
-	GT  reduce 84
-	LE  reduce 84
-	GE  reduce 84
+	.  reduce 104
 
 
 state 140
-	nested_var : Id Dot nested_var .  (88)
+	exp : Id LB2 exp . RB2  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	nested_var : Id LB2 exp . RB2 Dot Id  (101)
+	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp . RB2 Dot nested_var  (105)
+
+	RB2  shift 202
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	.  error
+
+
+state 141
+	trans : exp Colon LB3 . rests RB3 Semicolon trans  (108)
+	rests : .  (109)
+
+	Id  shift 203
+	RB3  reduce 109
+
+	rests  goto 204
+
+
+state 142
+	exp : exp . Equal exp  (87)
+	exp : exp Equal exp .  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	.  reduce 87
+
+
+state 143
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp Add exp .  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	Equal  shift 102
+	Mult  shift 105
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 91
+	Semicolon  reduce 91
+	Comma  reduce 91
+	RB1  reduce 91
+	RB2  reduce 91
+	RB3  reduce 91
+	Add  reduce 91
+	Minus  reduce 91
+	Ando  reduce 91
+	Oro  reduce 91
+
+
+state 144
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp Minus exp .  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	Equal  shift 102
+	Mult  shift 105
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 92
+	Semicolon  reduce 92
+	Comma  reduce 92
+	RB1  reduce 92
+	RB2  reduce 92
+	RB3  reduce 92
+	Add  reduce 92
+	Minus  reduce 92
+	Ando  reduce 92
+	Oro  reduce 92
+
+
+state 145
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp Mult exp .  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	Equal  shift 102
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 93
+	Semicolon  reduce 93
+	Comma  reduce 93
+	RB1  reduce 93
+	RB2  reduce 93
+	RB3  reduce 93
+	Add  reduce 93
+	Minus  reduce 93
+	Mult  reduce 93
+	Ando  reduce 93
+	Oro  reduce 93
+
+
+state 146
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp Ando exp .  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 89
+	Semicolon  reduce 89
+	Comma  reduce 89
+	RB1  reduce 89
+	RB2  reduce 89
+	RB3  reduce 89
+	Ando  reduce 89
+	Oro  reduce 89
+
+
+state 147
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp Oro exp .  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	Colon  reduce 90
+	Semicolon  reduce 90
+	Comma  reduce 90
+	RB1  reduce 90
+	RB2  reduce 90
+	RB3  reduce 90
+	Oro  reduce 90
+
+
+state 148
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp Non_equal exp .  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
 	.  reduce 88
 
 
-state 141
-	exp : Id LB1 exp . RB1  (66)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	RB1  shift 203
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	.  error
-
-
-state 142
-	exp : Id LB2 exp . RB2  (65)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	nested_var : Id LB2 exp . RB2 Dot Id  (85)
-	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp . RB2 Dot nested_var  (89)
-
-	RB2  shift 204
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	.  error
-
-
-state 143
-	trans : exp Colon LB3 . rests RB3 Semicolon trans  (92)
-	rests : .  (93)
-
-	Id  shift 205
-	RB3  reduce 93
-
-	rests  goto 206
-
-
-state 144
-	exp : exp . Equal exp  (71)
-	exp : exp Equal exp .  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	.  reduce 71
-
-
-state 145
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp Add exp .  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	Equal  shift 103
-	Mult  shift 106
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 75
-	Semicolon  reduce 75
-	Comma  reduce 75
-	RB1  reduce 75
-	RB2  reduce 75
-	RB3  reduce 75
-	Add  reduce 75
-	Minus  reduce 75
-	Ando  reduce 75
-	Oro  reduce 75
-
-
-state 146
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp Minus exp .  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	Equal  shift 103
-	Mult  shift 106
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 76
-	Semicolon  reduce 76
-	Comma  reduce 76
-	RB1  reduce 76
-	RB2  reduce 76
-	RB3  reduce 76
-	Add  reduce 76
-	Minus  reduce 76
-	Ando  reduce 76
-	Oro  reduce 76
-
-
-state 147
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp Mult exp .  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	Equal  shift 103
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 77
-	Semicolon  reduce 77
-	Comma  reduce 77
-	RB1  reduce 77
-	RB2  reduce 77
-	RB3  reduce 77
-	Add  reduce 77
-	Minus  reduce 77
-	Mult  reduce 77
-	Ando  reduce 77
-	Oro  reduce 77
-
-
-state 148
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp Ando exp .  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 73
-	Semicolon  reduce 73
-	Comma  reduce 73
-	RB1  reduce 73
-	RB2  reduce 73
-	RB3  reduce 73
-	Ando  reduce 73
-	Oro  reduce 73
-
-
 state 149
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp Oro exp .  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp Mod exp .  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
-	Colon  reduce 74
-	Semicolon  reduce 74
-	Comma  reduce 74
-	RB1  reduce 74
-	RB2  reduce 74
-	RB3  reduce 74
-	Oro  reduce 74
+	.  reduce 94
 
 
 state 150
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp Non_equal exp .  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp LT exp .  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 72
+	.  reduce 95
 
 
 state 151
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp Mod exp .  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp GT exp .  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 78
+	.  reduce 96
 
 
 state 152
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp LT exp .  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp LE exp .  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 79
+	.  reduce 97
 
 
 state 153
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp GT exp .  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	exp : exp GE exp .  (98)
 
-	.  reduce 80
+	.  reduce 98
 
 
 state 154
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp LE exp .  (81)
-	exp : exp . GE exp  (82)
+	atomic_decl : Atomic LB3 atomics RB3 .  (115)
 
-	.  reduce 81
+	.  reduce 115
 
 
 state 155
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	exp : exp GE exp .  (82)
+	atomics : atomics Id . LB1 bound_var RB1 Assigno state_expr Semicolon  (117)
 
-	.  reduce 82
+	LB1  shift 205
+	.  error
 
 
 state 156
-	atomic_decl : Atomic LB3 atomics RB3 .  (100)
+	fml : Top .  (125)
 
-	.  reduce 100
+	.  reduce 125
 
 
 state 157
-	atomics : atomics Id . LB1 bound_var RB1 Assigno exp Semicolon  (102)
+	fml : Bottom .  (126)
+
+	.  reduce 126
+
+
+state 158
+	fml : AX . LB1 Id Comma fml Comma Id RB1  (133)
+
+	LB1  shift 206
+	.  error
+
+
+state 159
+	fml : EX . LB1 Id Comma fml Comma Id RB1  (134)
 
 	LB1  shift 207
 	.  error
 
 
-state 158
-	fml : Top .  (110)
-
-	.  reduce 110
-
-
-state 159
-	fml : Bottom .  (111)
-
-	.  reduce 111
-
-
 state 160
-	fml : AX . LB1 Id Comma fml Comma Id RB1  (116)
+	fml : AF . LB1 Id Comma fml Comma Id RB1  (135)
 
 	LB1  shift 208
 	.  error
 
 
 state 161
-	fml : EX . LB1 Id Comma fml Comma Id RB1  (117)
+	fml : EG . LB1 Id Comma fml Comma Id RB1  (136)
 
 	LB1  shift 209
 	.  error
 
 
 state 162
-	fml : AF . LB1 Id Comma fml Comma Id RB1  (118)
+	fml : AR . LB1 Id Comma Id Comma fml Comma fml Comma Id RB1  (137)
 
 	LB1  shift 210
 	.  error
 
 
 state 163
-	fml : EG . LB1 Id Comma fml Comma Id RB1  (119)
+	fml : EU . LB1 Id Comma Id Comma fml Comma fml Comma Id RB1  (138)
 
 	LB1  shift 211
 	.  error
 
 
 state 164
-	fml : AR . LB1 Id Comma Id Comma fml Comma fml Comma Id RB1  (120)
+	fml : Neg . fml  (130)
 
-	LB1  shift 212
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
+
+	fml  goto 212
 
 
 state 165
-	fml : EU . LB1 Id Comma Id Comma fml Comma fml Comma Id RB1  (121)
+	fml : LB1 . fml RB1  (139)
 
-	LB1  shift 213
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
+
+	fml  goto 213
 
 
 state 166
-	fml : Neg . fml  (113)
+	fml : Id . LB1 atom_fml_para RB1  (127)
+	fml : Id . LB1 RB1  (128)
+	fml : Id . LB1 Id RB1  (129)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	LB1  shift 214
 	.  error
-
-	fml  goto 215
 
 
 state 167
-	fml : LB1 . fml RB1  (122)
+	fairness_decl : Fairness LB3 fairness . RB3  (112)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	RB3  shift 215
 	.  error
-
-	fml  goto 216
 
 
 state 168
-	fairness : Id . LB1 Id RB1 Semicolon fairness  (98)
-	fml : Id . LB1 atom_fml_para RB1  (112)
+	fairness : fml . Semicolon fairness  (114)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
 
-	LB1  shift 217
+	Semicolon  shift 216
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
 state 169
-	fairness_decl : Fairness LB3 fairness . RB3  (96)
+	specs : Id . Assigno fml Semicolon specs  (124)
 
-	RB3  shift 218
+	Assigno  shift 219
 	.  error
 
 
 state 170
-	fairness : fml . Semicolon fairness  (99)
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
+	spec_decl : Spec LB3 specs . RB3  (122)
 
-	Semicolon  shift 219
-	And  shift 220
-	Or  shift 221
+	RB3  shift 220
 	.  error
 
 
 state 171
-	specs : Id . Assigno fml Semicolon specs  (109)
-
-	Assigno  shift 222
-	.  error
-
-
-state 172
-	spec_decl : Spec LB3 specs . RB3  (107)
-
-	RB3  shift 223
-	.  error
-
-
-state 173
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl init_decl trans_decl atomic_decl fairness_decl spec_decl RB3 .  (7)
 
 	.  reduce 7
 
 
-state 174
+state 172
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl spec_decl RB3 .  (6)
 
 	.  reduce 6
 
 
-state 175
+state 173
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl fairness_decl spec_decl . RB3  (8)
 
-	RB3  shift 224
+	RB3  shift 221
 	.  error
 
 
-state 176
+state 174
 	vars : Id Colon expr_type LB2 exp RB2 . Semicolon vars  (22)
 
-	Semicolon  shift 225
+	Semicolon  shift 222
 	.  error
 
 
-state 177
+state 175
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -2374,43 +2351,23 @@ state 177
 	dexp : dexp . GE dexp  (45)
 	dexp : LB1 dexp . RB1  (46)
 
-	RB1  shift 226
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	RB1  shift 223
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Oro  shift 187
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	.  error
 
 
-178: shift/reduce conflict (shift 227, reduce 30) on RB1
-state 178
-	dexp : dnested_var .  (30)
-	dnested_var : LB1 dnested_var . RB1  (53)
-
-	RB1  shift 227
-	Equal  reduce 30
-	Add  reduce 30
-	Minus  reduce 30
-	Mult  reduce 30
-	Ando  reduce 30
-	Oro  reduce 30
-	Non_equal  reduce 30
-	Mod  reduce 30
-	LT  reduce 30
-	GT  reduce 30
-	LE  reduce 30
-	GE  reduce 30
-
-
-state 179
+state 176
 	dexp : Minus dexp .  (32)
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
@@ -2425,14 +2382,14 @@ state 179
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Mult  shift 188
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Mult  shift 185
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 32
 	RB1  reduce 32
 	RB2  reduce 32
@@ -2442,13 +2399,13 @@ state 179
 	Oro  reduce 32
 
 
-state 180
+state 177
 	dexp : Scalar Id .  (31)
 
 	.  reduce 31
 
 
-state 181
+state 178
 	dexp : Nego dexp .  (33)
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
@@ -2466,313 +2423,325 @@ state 181
 	.  reduce 33
 
 
-state 182
+state 179
 	dnested_var : Id Dot . Id  (47)
 	dnested_var : Id Dot . Id LB2 dexp RB2  (49)
 	dnested_var : Id Dot . dnested_var  (51)
 
-	LB1  shift 228
-	Id  shift 229
+	Id  shift 224
 	.  error
 
-	dnested_var  goto 230
+	dnested_var  goto 225
 
 
-state 183
+state 180
 	dexp : Id LB2 . dexp RB2  (29)
 	dnested_var : Id LB2 . dexp RB2 Dot Id  (48)
 	dnested_var : Id LB2 . dexp RB2 Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 . dexp RB2 Dot dnested_var  (52)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 231
-	dnested_var  goto 133
+	dexp  goto 226
+	dnested_var  goto 132
 
 
-state 184
+state 181
 	symbols : symbols Id Assigno dexp Semicolon .  (25)
 
 	.  reduce 25
 
 
-state 185
+state 182
 	dexp : dexp Equal . dexp  (34)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 232
-	dnested_var  goto 133
+	dexp  goto 227
+	dnested_var  goto 132
+
+
+state 183
+	dexp : dexp Add . dexp  (38)
+
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
+	.  error
+
+	dexp  goto 228
+	dnested_var  goto 132
+
+
+state 184
+	dexp : dexp Minus . dexp  (39)
+
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
+	.  error
+
+	dexp  goto 229
+	dnested_var  goto 132
+
+
+state 185
+	dexp : dexp Mult . dexp  (40)
+
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
+	.  error
+
+	dexp  goto 230
+	dnested_var  goto 132
 
 
 state 186
-	dexp : dexp Add . dexp  (38)
+	dexp : dexp Ando . dexp  (36)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 233
-	dnested_var  goto 133
+	dexp  goto 231
+	dnested_var  goto 132
 
 
 state 187
-	dexp : dexp Minus . dexp  (39)
+	dexp : dexp Oro . dexp  (37)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 234
-	dnested_var  goto 133
+	dexp  goto 232
+	dnested_var  goto 132
 
 
 state 188
-	dexp : dexp Mult . dexp  (40)
+	dexp : dexp Non_equal . dexp  (35)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 235
-	dnested_var  goto 133
+	dexp  goto 233
+	dnested_var  goto 132
 
 
 state 189
-	dexp : dexp Ando . dexp  (36)
+	dexp : dexp Mod . dexp  (41)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 236
-	dnested_var  goto 133
+	dexp  goto 234
+	dnested_var  goto 132
 
 
 state 190
-	dexp : dexp Oro . dexp  (37)
+	dexp : dexp LT . dexp  (42)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 237
-	dnested_var  goto 133
+	dexp  goto 235
+	dnested_var  goto 132
 
 
 state 191
-	dexp : dexp Non_equal . dexp  (35)
+	dexp : dexp GT . dexp  (43)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 238
-	dnested_var  goto 133
+	dexp  goto 236
+	dnested_var  goto 132
 
 
 state 192
-	dexp : dexp Mod . dexp  (41)
+	dexp : dexp LE . dexp  (44)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 239
-	dnested_var  goto 133
+	dexp  goto 237
+	dnested_var  goto 132
 
 
 state 193
-	dexp : dexp LT . dexp  (42)
+	dexp : dexp GE . dexp  (45)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 240
-	dnested_var  goto 133
+	dexp  goto 238
+	dnested_var  goto 132
 
 
 state 194
-	dexp : dexp GT . dexp  (43)
+	exps : exp Comma . exp  (61)
+	exps : exp Comma . exps  (62)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 72
+	Minus  shift 73
+	Scalar  shift 74
+	Nego  shift 75
+	Id  shift 76
+	I  shift 77
+	B  shift 78
 	.  error
 
-	dexp  goto 241
-	dnested_var  goto 133
+	exp  goto 239
+	exps  goto 240
+	nested_var  goto 80
 
 
 state 195
-	dexp : dexp LE . dexp  (44)
+	inis : Id Assigno LB3 exp RB3 . Semicolon inis  (57)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	Semicolon  shift 241
 	.  error
-
-	dexp  goto 242
-	dnested_var  goto 133
 
 
 state 196
-	dexp : dexp GE . dexp  (45)
+	inis : Id Assigno LB3 exps RB3 . Semicolon inis  (56)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	Semicolon  shift 242
 	.  error
-
-	dexp  goto 243
-	dnested_var  goto 133
 
 
 state 197
-	exps : exp Comma . exps  (61)
-	exps : .  (59)
+	inis : Id Assigno Id LB1 RB1 . Semicolon inis  (60)
 
-	LB1  shift 72
-	Minus  shift 73
-	Scalar  shift 74
-	Nego  shift 75
-	Id  shift 76
-	I  shift 77
-	B  shift 78
-	RB1  reduce 59
-	RB3  reduce 59
-
-	exp  goto 134
-	exps  goto 244
-	nested_var  goto 80
+	Semicolon  shift 243
+	.  error
 
 
 state 198
-	inis : Id Assigno LB3 exps RB3 . Semicolon inis  (57)
+	inis : Id Assigno Id LB1 exp . RB1 Semicolon inis  (59)
+	exps : exp . Comma exp  (61)
+	exps : exp . Comma exps  (62)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	Semicolon  shift 245
+	Comma  shift 194
+	RB1  shift 244
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
-199: shift/reduce conflict (shift 203, reduce 60) on RB1
 state 199
-	exps : exp .  (60)
-	exps : exp . Comma exps  (61)
-	exp : Id LB1 exp . RB1  (66)
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
+	inis : Id Assigno Id LB1 exps . RB1 Semicolon inis  (58)
 
-	Comma  shift 197
-	RB1  shift 203
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	RB1  shift 245
+	.  error
 
 
 state 200
-	inis : Id Assigno Id LB1 exps . RB1 Semicolon inis  (58)
+	inis : Id Assigno exp Semicolon inis .  (55)
 
-	RB1  shift 246
-	.  error
+	.  reduce 55
 
 
 state 201
-	inis : Id Assigno exp Semicolon inis .  (56)
-
-	.  reduce 56
-
-
-state 202
-	nested_var : Id LB2 . exp RB2 Dot Id  (85)
-	nested_var : Id Dot Id LB2 . exp RB2  (86)
-	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 . exp RB2 Dot nested_var  (89)
+	nested_var : Id LB2 . exp RB2 Dot Id  (101)
+	nested_var : Id Dot Id LB2 . exp RB2  (102)
+	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 . exp RB2 Dot nested_var  (105)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -2783,278 +2752,250 @@ state 202
 	B  shift 78
 	.  error
 
-	exp  goto 247
+	exp  goto 246
 	nested_var  goto 80
 
 
+state 202
+	exp : Id LB2 exp RB2 .  (82)
+	nested_var : Id LB2 exp RB2 . Dot Id  (101)
+	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 . Dot nested_var  (105)
+
+	Dot  shift 247
+	Colon  reduce 82
+	Semicolon  reduce 82
+	Comma  reduce 82
+	RB1  reduce 82
+	RB2  reduce 82
+	RB3  reduce 82
+	Equal  reduce 82
+	Add  reduce 82
+	Minus  reduce 82
+	Mult  reduce 82
+	Ando  reduce 82
+	Oro  reduce 82
+	Non_equal  reduce 82
+	Mod  reduce 82
+	LT  reduce 82
+	GT  reduce 82
+	LE  reduce 82
+	GE  reduce 82
+
+
 state 203
-	exp : Id LB1 exp RB1 .  (66)
+	rests : Id . Assigno exp Semicolon rests  (110)
+	rests : Id . LB2 exp RB2 Assigno exp Semicolon rests  (111)
 
-	.  reduce 66
-
-
-state 204
-	exp : Id LB2 exp RB2 .  (65)
-	nested_var : Id LB2 exp RB2 . Dot Id  (85)
-	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 . Dot nested_var  (89)
-
-	Dot  shift 248
-	Colon  reduce 65
-	Semicolon  reduce 65
-	Comma  reduce 65
-	RB1  reduce 65
-	RB2  reduce 65
-	RB3  reduce 65
-	Equal  reduce 65
-	Add  reduce 65
-	Minus  reduce 65
-	Mult  reduce 65
-	Ando  reduce 65
-	Oro  reduce 65
-	Non_equal  reduce 65
-	Mod  reduce 65
-	LT  reduce 65
-	GT  reduce 65
-	LE  reduce 65
-	GE  reduce 65
-
-
-state 205
-	rests : Id . Assigno exp Semicolon rests  (94)
-	rests : Id . LB2 exp RB2 Assigno exp Semicolon rests  (95)
-
-	LB2  shift 249
-	Assigno  shift 250
+	LB2  shift 248
+	Assigno  shift 249
 	.  error
 
 
-state 206
-	trans : exp Colon LB3 rests . RB3 Semicolon trans  (92)
+state 204
+	trans : exp Colon LB3 rests . RB3 Semicolon trans  (108)
 
-	RB3  shift 251
+	RB3  shift 250
+	.  error
+
+
+state 205
+	atomics : atomics Id LB1 . bound_var RB1 Assigno state_expr Semicolon  (117)
+	bound_vars : .  (119)
+
+	Id  shift 251
+	RB1  reduce 119
+
+	bound_var  goto 252
+	bound_vars  goto 253
+
+
+state 206
+	fml : AX LB1 . Id Comma fml Comma Id RB1  (133)
+
+	Id  shift 254
 	.  error
 
 
 state 207
-	atomics : atomics Id LB1 . bound_var RB1 Assigno exp Semicolon  (102)
-	bound_vars : .  (104)
-
-	Id  shift 252
-	RB1  reduce 104
-
-	bound_var  goto 253
-	bound_vars  goto 254
-
-
-state 208
-	fml : AX LB1 . Id Comma fml Comma Id RB1  (116)
+	fml : EX LB1 . Id Comma fml Comma Id RB1  (134)
 
 	Id  shift 255
 	.  error
 
 
-state 209
-	fml : EX LB1 . Id Comma fml Comma Id RB1  (117)
+state 208
+	fml : AF LB1 . Id Comma fml Comma Id RB1  (135)
 
 	Id  shift 256
 	.  error
 
 
-state 210
-	fml : AF LB1 . Id Comma fml Comma Id RB1  (118)
+state 209
+	fml : EG LB1 . Id Comma fml Comma Id RB1  (136)
 
 	Id  shift 257
 	.  error
 
 
-state 211
-	fml : EG LB1 . Id Comma fml Comma Id RB1  (119)
+state 210
+	fml : AR LB1 . Id Comma Id Comma fml Comma fml Comma Id RB1  (137)
 
 	Id  shift 258
 	.  error
 
 
-state 212
-	fml : AR LB1 . Id Comma Id Comma fml Comma fml Comma Id RB1  (120)
+state 211
+	fml : EU LB1 . Id Comma Id Comma fml Comma fml Comma Id RB1  (138)
 
 	Id  shift 259
 	.  error
 
 
-state 213
-	fml : EU LB1 . Id Comma Id Comma fml Comma fml Comma Id RB1  (121)
+state 212
+	fml : Neg fml .  (130)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
 
-	Id  shift 260
+	.  reduce 130
+
+
+state 213
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : LB1 fml . RB1  (139)
+
+	RB1  shift 260
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
 state 214
-	fml : Id . LB1 atom_fml_para RB1  (112)
+	fml : Id LB1 . atom_fml_para RB1  (127)
+	fml : Id LB1 . RB1  (128)
+	fml : Id LB1 . Id RB1  (129)
 
-	LB1  shift 261
+	RB1  shift 261
+	Id  shift 262
 	.  error
+
+	atom_fml_para  goto 263
 
 
 state 215
-	fml : Neg fml .  (113)
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
+	fairness_decl : Fairness LB3 fairness RB3 .  (112)
 
-	.  reduce 113
+	.  reduce 112
 
 
 state 216
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : LB1 fml . RB1  (122)
+	fairness : fml Semicolon . fairness  (114)
+	fairness : .  (113)
 
-	RB1  shift 262
-	And  shift 220
-	Or  shift 221
-	.  error
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	RB3  reduce 113
+
+	fairness  goto 264
+	fml  goto 168
 
 
 state 217
-	fairness : Id LB1 . Id RB1 Semicolon fairness  (98)
-	fml : Id LB1 . atom_fml_para RB1  (112)
-	atom_fml_para : .  (123)
+	fml : fml And . fml  (131)
 
-	Id  shift 263
-	RB1  reduce 123
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	.  error
 
-	atom_fml_para  goto 264
+	fml  goto 265
 
 
 state 218
-	fairness_decl : Fairness LB3 fairness RB3 .  (96)
+	fml : fml Or . fml  (132)
 
-	.  reduce 96
-
-
-state 219
-	fairness : fml Semicolon . fairness  (99)
-	fairness : .  (97)
-
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 168
-	RB3  reduce 97
-
-	fairness  goto 265
-	fml  goto 170
-
-
-state 220
-	fml : fml And . fml  (114)
-
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
 	fml  goto 266
 
 
-state 221
-	fml : fml Or . fml  (115)
+state 219
+	specs : Id Assigno . fml Semicolon specs  (124)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
 	fml  goto 267
 
 
-state 222
-	specs : Id Assigno . fml Semicolon specs  (109)
+state 220
+	spec_decl : Spec LB3 specs RB3 .  (122)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
-	.  error
-
-	fml  goto 268
+	.  reduce 122
 
 
-state 223
-	spec_decl : Spec LB3 specs RB3 .  (107)
-
-	.  reduce 107
-
-
-state 224
+state 221
 	inputs : inputs Model Id LB1 parameters RB1 LB3 var_decl symbol_decl init_decl trans_decl atomic_decl fairness_decl spec_decl RB3 .  (8)
 
 	.  reduce 8
 
 
-state 225
+state 222
 	vars : Id Colon expr_type LB2 exp RB2 Semicolon . vars  (22)
 	vars : .  (20)
 
 	Id  shift 45
 	RB3  reduce 20
 
-	vars  goto 269
+	vars  goto 268
 
 
-state 226
+state 223
 	dexp : LB1 dexp RB1 .  (46)
 
 	.  reduce 46
 
 
-state 227
-	dnested_var : LB1 dnested_var RB1 .  (53)
-
-	.  reduce 53
-
-
-state 228
-	dnested_var : LB1 . dnested_var RB1  (53)
-
-	LB1  shift 228
-	Id  shift 270
-	.  error
-
-	dnested_var  goto 271
-
-
-state 229
+state 224
 	dnested_var : Id . Dot Id  (47)
 	dnested_var : Id Dot Id .  (47)
 	dnested_var : Id . LB2 dexp RB2 Dot Id  (48)
@@ -3064,8 +3005,8 @@ state 229
 	dnested_var : Id . Dot dnested_var  (51)
 	dnested_var : Id . LB2 dexp RB2 Dot dnested_var  (52)
 
-	Dot  shift 182
-	LB2  shift 272
+	Dot  shift 179
+	LB2  shift 269
 	Semicolon  reduce 47
 	RB1  reduce 47
 	RB2  reduce 47
@@ -3083,13 +3024,13 @@ state 229
 	GE  reduce 47
 
 
-state 230
+state 225
 	dnested_var : Id Dot dnested_var .  (51)
 
 	.  reduce 51
 
 
-state 231
+state 226
 	dexp : Id LB2 dexp . RB2  (29)
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
@@ -3107,23 +3048,23 @@ state 231
 	dnested_var : Id LB2 dexp . RB2 Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp . RB2 Dot dnested_var  (52)
 
-	RB2  shift 273
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	RB2  shift 270
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Oro  shift 187
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	.  error
 
 
-state 232
+state 227
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp Equal dexp .  (34)
 	dexp : dexp . Non_equal dexp  (35)
@@ -3141,7 +3082,7 @@ state 232
 	.  reduce 34
 
 
-state 233
+state 228
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3156,14 +3097,14 @@ state 233
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Mult  shift 188
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Mult  shift 185
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 38
 	RB1  reduce 38
 	RB2  reduce 38
@@ -3173,7 +3114,7 @@ state 233
 	Oro  reduce 38
 
 
-state 234
+state 229
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3188,14 +3129,14 @@ state 234
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Mult  shift 188
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Mult  shift 185
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 39
 	RB1  reduce 39
 	RB2  reduce 39
@@ -3205,7 +3146,7 @@ state 234
 	Oro  reduce 39
 
 
-state 235
+state 230
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3220,13 +3161,13 @@ state 235
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 40
 	RB1  reduce 40
 	RB2  reduce 40
@@ -3237,7 +3178,7 @@ state 235
 	Oro  reduce 40
 
 
-state 236
+state 231
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3252,16 +3193,16 @@ state 236
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 36
 	RB1  reduce 36
 	RB2  reduce 36
@@ -3269,7 +3210,7 @@ state 236
 	Oro  reduce 36
 
 
-state 237
+state 232
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3284,24 +3225,24 @@ state 237
 	dexp : dexp . LE dexp  (44)
 	dexp : dexp . GE dexp  (45)
 
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	Semicolon  reduce 37
 	RB1  reduce 37
 	RB2  reduce 37
 	Oro  reduce 37
 
 
-state 238
+state 233
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp Non_equal dexp .  (35)
@@ -3319,7 +3260,7 @@ state 238
 	.  reduce 35
 
 
-state 239
+state 234
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3337,7 +3278,7 @@ state 239
 	.  reduce 41
 
 
-state 240
+state 235
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3355,7 +3296,7 @@ state 240
 	.  reduce 42
 
 
-state 241
+state 236
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3373,7 +3314,7 @@ state 241
 	.  reduce 43
 
 
-state 242
+state 237
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3391,7 +3332,7 @@ state 242
 	.  reduce 44
 
 
-state 243
+state 238
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -3409,67 +3350,128 @@ state 243
 	.  reduce 45
 
 
-state 244
-	exps : exp Comma exps .  (61)
+state 239
+	exps : exp . Comma exp  (61)
+	exps : exp Comma exp .  (61)
+	exps : exp . Comma exps  (62)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 61
+	Comma  shift 194
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
+	RB1  reduce 61
+	RB3  reduce 61
+
+
+state 240
+	exps : exp Comma exps .  (62)
+
+	.  reduce 62
+
+
+state 241
+	inis : Id Assigno LB3 exp RB3 Semicolon . inis  (57)
+	inis : .  (54)
+
+	Id  shift 59
+	RB3  reduce 54
+
+	inis  goto 271
+
+
+state 242
+	inis : Id Assigno LB3 exps RB3 Semicolon . inis  (56)
+	inis : .  (54)
+
+	Id  shift 59
+	RB3  reduce 54
+
+	inis  goto 272
+
+
+state 243
+	inis : Id Assigno Id LB1 RB1 Semicolon . inis  (60)
+	inis : .  (54)
+
+	Id  shift 59
+	RB3  reduce 54
+
+	inis  goto 273
+
+
+state 244
+	inis : Id Assigno Id LB1 exp RB1 . Semicolon inis  (59)
+
+	Semicolon  shift 274
+	.  error
 
 
 state 245
-	inis : Id Assigno LB3 exps RB3 Semicolon . inis  (57)
-	inis : .  (55)
-
-	Id  shift 59
-	RB3  reduce 55
-
-	inis  goto 274
-
-
-state 246
 	inis : Id Assigno Id LB1 exps RB1 . Semicolon inis  (58)
 
 	Semicolon  shift 275
 	.  error
 
 
-state 247
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	nested_var : Id LB2 exp . RB2 Dot Id  (85)
-	nested_var : Id Dot Id LB2 exp . RB2  (86)
-	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp . RB2 Dot nested_var  (89)
+state 246
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	nested_var : Id LB2 exp . RB2 Dot Id  (101)
+	nested_var : Id Dot Id LB2 exp . RB2  (102)
+	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp . RB2 Dot nested_var  (105)
 
 	RB2  shift 276
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
-state 248
-	nested_var : Id LB2 exp RB2 Dot . Id  (85)
-	nested_var : Id LB2 exp RB2 Dot . Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 Dot . nested_var  (89)
+state 247
+	nested_var : Id LB2 exp RB2 Dot . Id  (101)
+	nested_var : Id LB2 exp RB2 Dot . Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 Dot . nested_var  (105)
 
 	Id  shift 277
 	.  error
@@ -3477,8 +3479,8 @@ state 248
 	nested_var  goto 278
 
 
-state 249
-	rests : Id LB2 . exp RB2 Assigno exp Semicolon rests  (95)
+state 248
+	rests : Id LB2 . exp RB2 Assigno exp Semicolon rests  (111)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -3493,8 +3495,8 @@ state 249
 	nested_var  goto 80
 
 
-state 250
-	rests : Id Assigno . exp Semicolon rests  (94)
+state 249
+	rests : Id Assigno . exp Semicolon rests  (110)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -3509,198 +3511,174 @@ state 250
 	nested_var  goto 80
 
 
-state 251
-	trans : exp Colon LB3 rests RB3 . Semicolon trans  (92)
+state 250
+	trans : exp Colon LB3 rests RB3 . Semicolon trans  (108)
 
 	Semicolon  shift 281
 	.  error
 
 
-state 252
-	bound_vars : Id .  (105)
-	bound_vars : Id . Comma bound_vars  (106)
+state 251
+	bound_vars : Id .  (120)
+	bound_vars : Id . Comma bound_vars  (121)
 
 	Comma  shift 282
-	RB1  reduce 105
+	RB1  reduce 120
 
 
-state 253
-	atomics : atomics Id LB1 bound_var . RB1 Assigno exp Semicolon  (102)
+state 252
+	atomics : atomics Id LB1 bound_var . RB1 Assigno state_expr Semicolon  (117)
 
 	RB1  shift 283
 	.  error
 
 
+state 253
+	bound_var : bound_vars .  (118)
+
+	.  reduce 118
+
+
 state 254
-	bound_var : bound_vars .  (103)
-
-	.  reduce 103
-
-
-state 255
-	fml : AX LB1 Id . Comma fml Comma Id RB1  (116)
+	fml : AX LB1 Id . Comma fml Comma Id RB1  (133)
 
 	Comma  shift 284
 	.  error
 
 
-state 256
-	fml : EX LB1 Id . Comma fml Comma Id RB1  (117)
+state 255
+	fml : EX LB1 Id . Comma fml Comma Id RB1  (134)
 
 	Comma  shift 285
 	.  error
 
 
-state 257
-	fml : AF LB1 Id . Comma fml Comma Id RB1  (118)
+state 256
+	fml : AF LB1 Id . Comma fml Comma Id RB1  (135)
 
 	Comma  shift 286
 	.  error
 
 
-state 258
-	fml : EG LB1 Id . Comma fml Comma Id RB1  (119)
+state 257
+	fml : EG LB1 Id . Comma fml Comma Id RB1  (136)
 
 	Comma  shift 287
 	.  error
 
 
-state 259
-	fml : AR LB1 Id . Comma Id Comma fml Comma fml Comma Id RB1  (120)
+state 258
+	fml : AR LB1 Id . Comma Id Comma fml Comma fml Comma Id RB1  (137)
 
 	Comma  shift 288
 	.  error
 
 
-state 260
-	fml : EU LB1 Id . Comma Id Comma fml Comma fml Comma Id RB1  (121)
+state 259
+	fml : EU LB1 Id . Comma Id Comma fml Comma fml Comma Id RB1  (138)
 
 	Comma  shift 289
 	.  error
 
 
+state 260
+	fml : LB1 fml RB1 .  (139)
+
+	.  reduce 139
+
+
 state 261
-	fml : Id LB1 . atom_fml_para RB1  (112)
-	atom_fml_para : .  (123)
+	fml : Id LB1 RB1 .  (128)
 
-	Id  shift 290
-	RB1  reduce 123
-
-	atom_fml_para  goto 264
+	.  reduce 128
 
 
 state 262
-	fml : LB1 fml RB1 .  (122)
+	fml : Id LB1 Id . RB1  (129)
+	atom_fml_para : Id . Comma Id  (140)
+	atom_fml_para : Id . Comma atom_fml_para  (141)
 
-	.  reduce 122
-
-
-263: shift/reduce conflict (shift 292, reduce 124) on RB1
-state 263
-	fairness : Id LB1 Id . RB1 Semicolon fairness  (98)
-	atom_fml_para : Id .  (124)
-	atom_fml_para : Id . Comma atom_fml_para  (125)
-
-	Comma  shift 291
-	RB1  shift 292
-
-
-state 264
-	fml : Id LB1 atom_fml_para . RB1  (112)
-
-	RB1  shift 293
+	Comma  shift 290
+	RB1  shift 291
 	.  error
 
 
-state 265
-	fairness : fml Semicolon fairness .  (99)
+state 263
+	fml : Id LB1 atom_fml_para . RB1  (127)
 
-	.  reduce 99
+	RB1  shift 292
+	.  error
 
 
-state 266
-	fml : fml . And fml  (114)
-	fml : fml And fml .  (114)
-	fml : fml . Or fml  (115)
+state 264
+	fairness : fml Semicolon fairness .  (114)
 
 	.  reduce 114
 
 
+state 265
+	fml : fml . And fml  (131)
+	fml : fml And fml .  (131)
+	fml : fml . Or fml  (132)
+
+	.  reduce 131
+
+
+state 266
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : fml Or fml .  (132)
+
+	And  shift 217
+	Semicolon  reduce 132
+	Comma  reduce 132
+	RB1  reduce 132
+	Or  reduce 132
+
+
 state 267
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : fml Or fml .  (115)
+	specs : Id Assigno fml . Semicolon specs  (124)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
 
-	And  shift 220
-	Semicolon  reduce 115
-	Comma  reduce 115
-	RB1  reduce 115
-	Or  reduce 115
-
-
-state 268
-	specs : Id Assigno fml . Semicolon specs  (109)
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-
-	Semicolon  shift 294
-	And  shift 220
-	Or  shift 221
+	Semicolon  shift 293
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
-state 269
+state 268
 	vars : Id Colon expr_type LB2 exp RB2 Semicolon vars .  (22)
 
 	.  reduce 22
 
 
-state 270
-	dnested_var : Id . Dot Id  (47)
-	dnested_var : Id . LB2 dexp RB2 Dot Id  (48)
-	dnested_var : Id . Dot Id LB2 dexp RB2  (49)
-	dnested_var : Id . LB2 dexp RB2 Dot Id LB2 dexp RB2  (50)
-	dnested_var : Id . Dot dnested_var  (51)
-	dnested_var : Id . LB2 dexp RB2 Dot dnested_var  (52)
-
-	Dot  shift 182
-	LB2  shift 295
-	.  error
-
-
-state 271
-	dnested_var : LB1 dnested_var . RB1  (53)
-
-	RB1  shift 227
-	.  error
-
-
-state 272
+state 269
 	dnested_var : Id LB2 . dexp RB2 Dot Id  (48)
 	dnested_var : Id Dot Id LB2 . dexp RB2  (49)
 	dnested_var : Id LB2 . dexp RB2 Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 . dexp RB2 Dot dnested_var  (52)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 296
-	dnested_var  goto 133
+	dexp  goto 294
+	dnested_var  goto 132
 
 
-state 273
+state 270
 	dexp : Id LB2 dexp RB2 .  (29)
 	dnested_var : Id LB2 dexp RB2 . Dot Id  (48)
 	dnested_var : Id LB2 dexp RB2 . Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp RB2 . Dot dnested_var  (52)
 
-	Dot  shift 297
+	Dot  shift 295
 	Semicolon  reduce 29
 	RB1  reduce 29
 	RB2  reduce 29
@@ -3718,152 +3696,174 @@ state 273
 	GE  reduce 29
 
 
-state 274
-	inis : Id Assigno LB3 exps RB3 Semicolon inis .  (57)
+state 271
+	inis : Id Assigno LB3 exp RB3 Semicolon inis .  (57)
 
 	.  reduce 57
 
 
-state 275
-	inis : Id Assigno Id LB1 exps RB1 Semicolon . inis  (58)
-	inis : .  (55)
+state 272
+	inis : Id Assigno LB3 exps RB3 Semicolon inis .  (56)
+
+	.  reduce 56
+
+
+state 273
+	inis : Id Assigno Id LB1 RB1 Semicolon inis .  (60)
+
+	.  reduce 60
+
+
+state 274
+	inis : Id Assigno Id LB1 exp RB1 Semicolon . inis  (59)
+	inis : .  (54)
 
 	Id  shift 59
-	RB3  reduce 55
+	RB3  reduce 54
 
-	inis  goto 298
+	inis  goto 296
+
+
+state 275
+	inis : Id Assigno Id LB1 exps RB1 Semicolon . inis  (58)
+	inis : .  (54)
+
+	Id  shift 59
+	RB3  reduce 54
+
+	inis  goto 297
 
 
 state 276
-	nested_var : Id LB2 exp RB2 . Dot Id  (85)
-	nested_var : Id Dot Id LB2 exp RB2 .  (86)
-	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 . Dot nested_var  (89)
+	nested_var : Id LB2 exp RB2 . Dot Id  (101)
+	nested_var : Id Dot Id LB2 exp RB2 .  (102)
+	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 . Dot nested_var  (105)
 
-	Dot  shift 248
-	Colon  reduce 86
-	Semicolon  reduce 86
-	Comma  reduce 86
-	RB1  reduce 86
-	RB2  reduce 86
-	RB3  reduce 86
-	Equal  reduce 86
-	Add  reduce 86
-	Minus  reduce 86
-	Mult  reduce 86
-	Ando  reduce 86
-	Oro  reduce 86
-	Non_equal  reduce 86
-	Mod  reduce 86
-	LT  reduce 86
-	GT  reduce 86
-	LE  reduce 86
-	GE  reduce 86
+	Dot  shift 247
+	Colon  reduce 102
+	Semicolon  reduce 102
+	Comma  reduce 102
+	RB1  reduce 102
+	RB2  reduce 102
+	RB3  reduce 102
+	Equal  reduce 102
+	Add  reduce 102
+	Minus  reduce 102
+	Mult  reduce 102
+	Ando  reduce 102
+	Oro  reduce 102
+	Non_equal  reduce 102
+	Mod  reduce 102
+	LT  reduce 102
+	GT  reduce 102
+	LE  reduce 102
+	GE  reduce 102
 
 
 state 277
-	nested_var : Id . Dot Id  (84)
-	nested_var : Id . LB2 exp RB2 Dot Id  (85)
-	nested_var : Id LB2 exp RB2 Dot Id .  (85)
-	nested_var : Id . Dot Id LB2 exp RB2  (86)
-	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 Dot Id . LB2 exp RB2  (87)
-	nested_var : Id . Dot nested_var  (88)
-	nested_var : Id . LB2 exp RB2 Dot nested_var  (89)
+	nested_var : Id . Dot Id  (100)
+	nested_var : Id . LB2 exp RB2 Dot Id  (101)
+	nested_var : Id LB2 exp RB2 Dot Id .  (101)
+	nested_var : Id . Dot Id LB2 exp RB2  (102)
+	nested_var : Id . LB2 exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 Dot Id . LB2 exp RB2  (103)
+	nested_var : Id . Dot nested_var  (104)
+	nested_var : Id . LB2 exp RB2 Dot nested_var  (105)
 
 	Dot  shift 99
-	LB2  shift 299
-	Colon  reduce 85
-	Semicolon  reduce 85
-	Comma  reduce 85
-	RB1  reduce 85
-	RB2  reduce 85
-	RB3  reduce 85
-	Equal  reduce 85
-	Add  reduce 85
-	Minus  reduce 85
-	Mult  reduce 85
-	Ando  reduce 85
-	Oro  reduce 85
-	Non_equal  reduce 85
-	Mod  reduce 85
-	LT  reduce 85
-	GT  reduce 85
-	LE  reduce 85
-	GE  reduce 85
+	LB2  shift 298
+	Colon  reduce 101
+	Semicolon  reduce 101
+	Comma  reduce 101
+	RB1  reduce 101
+	RB2  reduce 101
+	RB3  reduce 101
+	Equal  reduce 101
+	Add  reduce 101
+	Minus  reduce 101
+	Mult  reduce 101
+	Ando  reduce 101
+	Oro  reduce 101
+	Non_equal  reduce 101
+	Mod  reduce 101
+	LT  reduce 101
+	GT  reduce 101
+	LE  reduce 101
+	GE  reduce 101
 
 
 state 278
-	nested_var : Id LB2 exp RB2 Dot nested_var .  (89)
+	nested_var : Id LB2 exp RB2 Dot nested_var .  (105)
 
-	.  reduce 89
+	.  reduce 105
 
 
 state 279
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	rests : Id LB2 exp . RB2 Assigno exp Semicolon rests  (95)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	rests : Id LB2 exp . RB2 Assigno exp Semicolon rests  (111)
 
-	RB2  shift 300
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	RB2  shift 299
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 280
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	rests : Id Assigno exp . Semicolon rests  (94)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	rests : Id Assigno exp . Semicolon rests  (110)
 
-	Semicolon  shift 301
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Semicolon  shift 300
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 281
-	trans : exp Colon LB3 rests RB3 Semicolon . trans  (92)
-	trans : .  (91)
+	trans : exp Colon LB3 rests RB3 Semicolon . trans  (108)
+	trans : .  (107)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -3872,180 +3872,153 @@ state 281
 	Id  shift 76
 	I  shift 77
 	B  shift 78
-	RB3  reduce 91
+	RB3  reduce 107
 
 	exp  goto 79
 	nested_var  goto 80
-	trans  goto 302
+	trans  goto 301
 
 
 state 282
-	bound_vars : Id Comma . bound_vars  (106)
-	bound_vars : .  (104)
+	bound_vars : Id Comma . bound_vars  (121)
+	bound_vars : .  (119)
 
-	Id  shift 252
-	RB1  reduce 104
+	Id  shift 251
+	RB1  reduce 119
 
-	bound_vars  goto 303
+	bound_vars  goto 302
 
 
 state 283
-	atomics : atomics Id LB1 bound_var RB1 . Assigno exp Semicolon  (102)
+	atomics : atomics Id LB1 bound_var RB1 . Assigno state_expr Semicolon  (117)
 
-	Assigno  shift 304
+	Assigno  shift 303
 	.  error
 
 
 state 284
-	fml : AX LB1 Id Comma . fml Comma Id RB1  (116)
+	fml : AX LB1 Id Comma . fml Comma Id RB1  (133)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	.  error
+
+	fml  goto 304
+
+
+state 285
+	fml : EX LB1 Id Comma . fml Comma Id RB1  (134)
+
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
 	fml  goto 305
 
 
-state 285
-	fml : EX LB1 Id Comma . fml Comma Id RB1  (117)
+state 286
+	fml : AF LB1 Id Comma . fml Comma Id RB1  (135)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
 	fml  goto 306
 
 
-state 286
-	fml : AF LB1 Id Comma . fml Comma Id RB1  (118)
+state 287
+	fml : EG LB1 Id Comma . fml Comma Id RB1  (136)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
 	fml  goto 307
 
 
-state 287
-	fml : EG LB1 Id Comma . fml Comma Id RB1  (119)
+state 288
+	fml : AR LB1 Id Comma . Id Comma fml Comma fml Comma Id RB1  (137)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Id  shift 308
 	.  error
 
-	fml  goto 308
 
-
-state 288
-	fml : AR LB1 Id Comma . Id Comma fml Comma fml Comma Id RB1  (120)
+state 289
+	fml : EU LB1 Id Comma . Id Comma fml Comma fml Comma Id RB1  (138)
 
 	Id  shift 309
 	.  error
 
 
-state 289
-	fml : EU LB1 Id Comma . Id Comma fml Comma fml Comma Id RB1  (121)
+state 290
+	atom_fml_para : Id Comma . Id  (140)
+	atom_fml_para : Id Comma . atom_fml_para  (141)
 
 	Id  shift 310
 	.  error
 
-
-state 290
-	atom_fml_para : Id .  (124)
-	atom_fml_para : Id . Comma atom_fml_para  (125)
-
-	Comma  shift 291
-	RB1  reduce 124
-
-
-state 291
-	atom_fml_para : Id Comma . atom_fml_para  (125)
-	atom_fml_para : .  (123)
-
-	Id  shift 290
-	RB1  reduce 123
-
 	atom_fml_para  goto 311
 
 
-state 292
-	fairness : Id LB1 Id RB1 . Semicolon fairness  (98)
+state 291
+	fml : Id LB1 Id RB1 .  (129)
 
-	Semicolon  shift 312
-	.  error
+	.  reduce 129
+
+
+state 292
+	fml : Id LB1 atom_fml_para RB1 .  (127)
+
+	.  reduce 127
 
 
 state 293
-	fml : Id LB1 atom_fml_para RB1 .  (112)
+	specs : Id Assigno fml Semicolon . specs  (124)
+	specs : .  (123)
 
-	.  reduce 112
+	Id  shift 169
+	RB3  reduce 123
+
+	specs  goto 312
 
 
 state 294
-	specs : Id Assigno fml Semicolon . specs  (109)
-	specs : .  (108)
-
-	Id  shift 171
-	RB3  reduce 108
-
-	specs  goto 313
-
-
-state 295
-	dnested_var : Id LB2 . dexp RB2 Dot Id  (48)
-	dnested_var : Id LB2 . dexp RB2 Dot Id LB2 dexp RB2  (50)
-	dnested_var : Id LB2 . dexp RB2 Dot dnested_var  (52)
-
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
-	.  error
-
-	dexp  goto 314
-	dnested_var  goto 133
-
-
-state 296
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -4063,45 +4036,50 @@ state 296
 	dnested_var : Id LB2 dexp . RB2 Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp . RB2 Dot dnested_var  (52)
 
-	RB2  shift 315
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	RB2  shift 313
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Oro  shift 187
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	.  error
 
 
-state 297
+state 295
 	dnested_var : Id LB2 dexp RB2 Dot . Id  (48)
 	dnested_var : Id LB2 dexp RB2 Dot . Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp RB2 Dot . dnested_var  (52)
 
-	LB1  shift 228
-	Id  shift 316
+	Id  shift 314
 	.  error
 
-	dnested_var  goto 317
+	dnested_var  goto 315
 
 
-state 298
+state 296
+	inis : Id Assigno Id LB1 exp RB1 Semicolon inis .  (59)
+
+	.  reduce 59
+
+
+state 297
 	inis : Id Assigno Id LB1 exps RB1 Semicolon inis .  (58)
 
 	.  reduce 58
 
 
-state 299
-	nested_var : Id LB2 . exp RB2 Dot Id  (85)
-	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 Dot Id LB2 . exp RB2  (87)
-	nested_var : Id LB2 . exp RB2 Dot nested_var  (89)
+state 298
+	nested_var : Id LB2 . exp RB2 Dot Id  (101)
+	nested_var : Id LB2 . exp RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 Dot Id LB2 . exp RB2  (103)
+	nested_var : Id LB2 . exp RB2 Dot nested_var  (105)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -4112,186 +4090,137 @@ state 299
 	B  shift 78
 	.  error
 
-	exp  goto 318
+	exp  goto 316
 	nested_var  goto 80
+
+
+state 299
+	rests : Id LB2 exp RB2 . Assigno exp Semicolon rests  (111)
+
+	Assigno  shift 317
+	.  error
 
 
 state 300
-	rests : Id LB2 exp RB2 . Assigno exp Semicolon rests  (95)
+	rests : Id Assigno exp Semicolon . rests  (110)
+	rests : .  (109)
 
-	Assigno  shift 319
-	.  error
+	Id  shift 203
+	RB3  reduce 109
+
+	rests  goto 318
 
 
 state 301
-	rests : Id Assigno exp Semicolon . rests  (94)
-	rests : .  (93)
+	trans : exp Colon LB3 rests RB3 Semicolon trans .  (108)
 
-	Id  shift 205
-	RB3  reduce 93
-
-	rests  goto 320
+	.  reduce 108
 
 
 state 302
-	trans : exp Colon LB3 rests RB3 Semicolon trans .  (92)
+	bound_vars : Id Comma bound_vars .  (121)
 
-	.  reduce 92
+	.  reduce 121
 
 
 state 303
-	bound_vars : Id Comma bound_vars .  (106)
+	atomics : atomics Id LB1 bound_var RB1 Assigno . state_expr Semicolon  (117)
 
-	.  reduce 106
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 323
 
 
 state 304
-	atomics : atomics Id LB1 bound_var RB1 Assigno . exp Semicolon  (102)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : AX LB1 Id Comma fml . Comma Id RB1  (133)
 
-	LB1  shift 72
-	Minus  shift 73
-	Scalar  shift 74
-	Nego  shift 75
-	Id  shift 76
-	I  shift 77
-	B  shift 78
+	Comma  shift 324
+	And  shift 217
+	Or  shift 218
 	.  error
-
-	exp  goto 321
-	nested_var  goto 80
 
 
 state 305
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : AX LB1 Id Comma fml . Comma Id RB1  (116)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : EX LB1 Id Comma fml . Comma Id RB1  (134)
 
-	Comma  shift 322
-	And  shift 220
-	Or  shift 221
+	Comma  shift 325
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
 state 306
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : EX LB1 Id Comma fml . Comma Id RB1  (117)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : AF LB1 Id Comma fml . Comma Id RB1  (135)
 
-	Comma  shift 323
-	And  shift 220
-	Or  shift 221
+	Comma  shift 326
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
 state 307
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : AF LB1 Id Comma fml . Comma Id RB1  (118)
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : EG LB1 Id Comma fml . Comma Id RB1  (136)
 
-	Comma  shift 324
-	And  shift 220
-	Or  shift 221
+	Comma  shift 327
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
 state 308
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : EG LB1 Id Comma fml . Comma Id RB1  (119)
+	fml : AR LB1 Id Comma Id . Comma fml Comma fml Comma Id RB1  (137)
 
-	Comma  shift 325
-	And  shift 220
-	Or  shift 221
+	Comma  shift 328
 	.  error
 
 
 state 309
-	fml : AR LB1 Id Comma Id . Comma fml Comma fml Comma Id RB1  (120)
+	fml : EU LB1 Id Comma Id . Comma fml Comma fml Comma Id RB1  (138)
 
-	Comma  shift 326
+	Comma  shift 329
 	.  error
 
 
 state 310
-	fml : EU LB1 Id Comma Id . Comma fml Comma fml Comma Id RB1  (121)
+	atom_fml_para : Id . Comma Id  (140)
+	atom_fml_para : Id Comma Id .  (140)
+	atom_fml_para : Id . Comma atom_fml_para  (141)
 
-	Comma  shift 327
-	.  error
+	Comma  shift 290
+	RB1  reduce 140
 
 
 state 311
-	atom_fml_para : Id Comma atom_fml_para .  (125)
+	atom_fml_para : Id Comma atom_fml_para .  (141)
 
-	.  reduce 125
+	.  reduce 141
 
 
 state 312
-	fairness : Id LB1 Id RB1 Semicolon . fairness  (98)
-	fairness : .  (97)
+	specs : Id Assigno fml Semicolon specs .  (124)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 168
-	RB3  reduce 97
-
-	fairness  goto 328
-	fml  goto 170
+	.  reduce 124
 
 
 state 313
-	specs : Id Assigno fml Semicolon specs .  (109)
-
-	.  reduce 109
-
-
-state 314
-	dexp : dexp . Equal dexp  (34)
-	dexp : dexp . Non_equal dexp  (35)
-	dexp : dexp . Ando dexp  (36)
-	dexp : dexp . Oro dexp  (37)
-	dexp : dexp . Add dexp  (38)
-	dexp : dexp . Minus dexp  (39)
-	dexp : dexp . Mult dexp  (40)
-	dexp : dexp . Mod dexp  (41)
-	dexp : dexp . LT dexp  (42)
-	dexp : dexp . GT dexp  (43)
-	dexp : dexp . LE dexp  (44)
-	dexp : dexp . GE dexp  (45)
-	dnested_var : Id LB2 dexp . RB2 Dot Id  (48)
-	dnested_var : Id LB2 dexp . RB2 Dot Id LB2 dexp RB2  (50)
-	dnested_var : Id LB2 dexp . RB2 Dot dnested_var  (52)
-
-	RB2  shift 329
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
-	.  error
-
-
-state 315
 	dnested_var : Id LB2 dexp RB2 . Dot Id  (48)
 	dnested_var : Id Dot Id LB2 dexp RB2 .  (49)
 	dnested_var : Id LB2 dexp RB2 . Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp RB2 . Dot dnested_var  (52)
 
-	Dot  shift 297
+	Dot  shift 295
 	Semicolon  reduce 49
 	RB1  reduce 49
 	RB2  reduce 49
@@ -4309,7 +4238,7 @@ state 315
 	GE  reduce 49
 
 
-state 316
+state 314
 	dnested_var : Id . Dot Id  (47)
 	dnested_var : Id . LB2 dexp RB2 Dot Id  (48)
 	dnested_var : Id LB2 dexp RB2 Dot Id .  (48)
@@ -4319,7 +4248,7 @@ state 316
 	dnested_var : Id . Dot dnested_var  (51)
 	dnested_var : Id . LB2 dexp RB2 Dot dnested_var  (52)
 
-	Dot  shift 182
+	Dot  shift 179
 	LB2  shift 330
 	Semicolon  reduce 48
 	RB1  reduce 48
@@ -4338,48 +4267,48 @@ state 316
 	GE  reduce 48
 
 
-state 317
+state 315
 	dnested_var : Id LB2 dexp RB2 Dot dnested_var .  (52)
 
 	.  reduce 52
 
 
-state 318
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	nested_var : Id LB2 exp . RB2 Dot Id  (85)
-	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 Dot Id LB2 exp . RB2  (87)
-	nested_var : Id LB2 exp . RB2 Dot nested_var  (89)
+state 316
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	nested_var : Id LB2 exp . RB2 Dot Id  (101)
+	nested_var : Id LB2 exp . RB2 Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 Dot Id LB2 exp . RB2  (103)
+	nested_var : Id LB2 exp . RB2 Dot nested_var  (105)
 
 	RB2  shift 331
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
-state 319
-	rests : Id LB2 exp RB2 Assigno . exp Semicolon rests  (95)
+state 317
+	rests : Id LB2 exp RB2 Assigno . exp Semicolon rests  (111)
 
 	LB1  shift 72
 	Minus  shift 73
@@ -4394,122 +4323,150 @@ state 319
 	nested_var  goto 80
 
 
-state 320
-	rests : Id Assigno exp Semicolon rests .  (94)
+state 318
+	rests : Id Assigno exp Semicolon rests .  (110)
 
-	.  reduce 94
+	.  reduce 110
+
+
+state 319
+	state_expr : LB1 . state_expr RB1  (78)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 333
+
+
+state 320
+	state_expr : Minus . state_expr  (64)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 334
 
 
 state 321
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	atomics : atomics Id LB1 bound_var RB1 Assigno exp . Semicolon  (102)
+	state_expr : Nego . state_expr  (65)
 
-	Semicolon  shift 333
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
 	.  error
+
+	state_expr  goto 335
 
 
 state 322
-	fml : AX LB1 Id Comma fml Comma . Id RB1  (116)
+	state_expr : Id . LB1 exp RB1  (63)
 
-	Id  shift 334
+	LB1  shift 336
 	.  error
 
 
 state 323
-	fml : EX LB1 Id Comma fml Comma . Id RB1  (117)
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+	atomics : atomics Id LB1 bound_var RB1 Assigno state_expr . Semicolon  (117)
 
-	Id  shift 335
+	Semicolon  shift 337
+	Equal  shift 338
+	Add  shift 339
+	Minus  shift 340
+	Mult  shift 341
+	Ando  shift 342
+	Oro  shift 343
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
 	.  error
 
 
 state 324
-	fml : AF LB1 Id Comma fml Comma . Id RB1  (118)
+	fml : AX LB1 Id Comma fml Comma . Id RB1  (133)
 
-	Id  shift 336
+	Id  shift 350
 	.  error
 
 
 state 325
-	fml : EG LB1 Id Comma fml Comma . Id RB1  (119)
+	fml : EX LB1 Id Comma fml Comma . Id RB1  (134)
 
-	Id  shift 337
+	Id  shift 351
 	.  error
 
 
 state 326
-	fml : AR LB1 Id Comma Id Comma . fml Comma fml Comma Id RB1  (120)
+	fml : AF LB1 Id Comma fml Comma . Id RB1  (135)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Id  shift 352
 	.  error
-
-	fml  goto 338
 
 
 state 327
-	fml : EU LB1 Id Comma Id Comma . fml Comma fml Comma Id RB1  (121)
+	fml : EG LB1 Id Comma fml Comma . Id RB1  (136)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Id  shift 353
 	.  error
-
-	fml  goto 339
 
 
 state 328
-	fairness : Id LB1 Id RB1 Semicolon fairness .  (98)
+	fml : AR LB1 Id Comma Id Comma . fml Comma fml Comma Id RB1  (137)
 
-	.  reduce 98
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	.  error
+
+	fml  goto 354
 
 
 state 329
-	dnested_var : Id LB2 dexp RB2 . Dot Id  (48)
-	dnested_var : Id LB2 dexp RB2 . Dot Id LB2 dexp RB2  (50)
-	dnested_var : Id LB2 dexp RB2 . Dot dnested_var  (52)
+	fml : EU LB1 Id Comma Id Comma . fml Comma fml Comma Id RB1  (138)
 
-	Dot  shift 297
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
+
+	fml  goto 355
 
 
 state 330
@@ -4518,134 +4475,374 @@ state 330
 	dnested_var : Id LB2 dexp RB2 Dot Id LB2 . dexp RB2  (50)
 	dnested_var : Id LB2 . dexp RB2 Dot dnested_var  (52)
 
-	LB1  shift 125
-	Minus  shift 126
-	Scalar  shift 127
-	Nego  shift 128
-	Id  shift 129
-	I  shift 130
-	B  shift 131
+	LB1  shift 124
+	Minus  shift 125
+	Scalar  shift 126
+	Nego  shift 127
+	Id  shift 128
+	I  shift 129
+	B  shift 130
 	.  error
 
-	dexp  goto 340
-	dnested_var  goto 133
+	dexp  goto 356
+	dnested_var  goto 132
 
 
 state 331
-	nested_var : Id LB2 exp RB2 . Dot Id  (85)
-	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (87)
-	nested_var : Id LB2 exp RB2 Dot Id LB2 exp RB2 .  (87)
-	nested_var : Id LB2 exp RB2 . Dot nested_var  (89)
+	nested_var : Id LB2 exp RB2 . Dot Id  (101)
+	nested_var : Id LB2 exp RB2 . Dot Id LB2 exp RB2  (103)
+	nested_var : Id LB2 exp RB2 Dot Id LB2 exp RB2 .  (103)
+	nested_var : Id LB2 exp RB2 . Dot nested_var  (105)
 
-	Dot  shift 248
-	Colon  reduce 87
-	Semicolon  reduce 87
-	Comma  reduce 87
-	RB1  reduce 87
-	RB2  reduce 87
-	RB3  reduce 87
-	Equal  reduce 87
-	Add  reduce 87
-	Minus  reduce 87
-	Mult  reduce 87
-	Ando  reduce 87
-	Oro  reduce 87
-	Non_equal  reduce 87
-	Mod  reduce 87
-	LT  reduce 87
-	GT  reduce 87
-	LE  reduce 87
-	GE  reduce 87
+	Dot  shift 247
+	Colon  reduce 103
+	Semicolon  reduce 103
+	Comma  reduce 103
+	RB1  reduce 103
+	RB2  reduce 103
+	RB3  reduce 103
+	Equal  reduce 103
+	Add  reduce 103
+	Minus  reduce 103
+	Mult  reduce 103
+	Ando  reduce 103
+	Oro  reduce 103
+	Non_equal  reduce 103
+	Mod  reduce 103
+	LT  reduce 103
+	GT  reduce 103
+	LE  reduce 103
+	GE  reduce 103
 
 
 state 332
-	exp : exp . Equal exp  (71)
-	exp : exp . Non_equal exp  (72)
-	exp : exp . Ando exp  (73)
-	exp : exp . Oro exp  (74)
-	exp : exp . Add exp  (75)
-	exp : exp . Minus exp  (76)
-	exp : exp . Mult exp  (77)
-	exp : exp . Mod exp  (78)
-	exp : exp . LT exp  (79)
-	exp : exp . GT exp  (80)
-	exp : exp . LE exp  (81)
-	exp : exp . GE exp  (82)
-	rests : Id LB2 exp RB2 Assigno exp . Semicolon rests  (95)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
+	rests : Id LB2 exp RB2 Assigno exp . Semicolon rests  (111)
 
-	Semicolon  shift 341
-	Equal  shift 103
-	Add  shift 104
-	Minus  shift 105
-	Mult  shift 106
-	Ando  shift 107
-	Oro  shift 108
-	Non_equal  shift 109
-	Mod  shift 110
-	LT  shift 111
-	GT  shift 112
-	LE  shift 113
-	GE  shift 114
+	Semicolon  shift 357
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
 
 state 333
-	atomics : atomics Id LB1 bound_var RB1 Assigno exp Semicolon .  (102)
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+	state_expr : LB1 state_expr . RB1  (78)
 
-	.  reduce 102
+	RB1  shift 358
+	Equal  shift 338
+	Add  shift 339
+	Minus  shift 340
+	Mult  shift 341
+	Ando  shift 342
+	Oro  shift 343
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	.  error
 
 
 state 334
-	fml : AX LB1 Id Comma fml Comma Id . RB1  (116)
+	state_expr : Minus state_expr .  (64)
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
 
-	RB1  shift 342
-	.  error
+	Equal  shift 338
+	Mult  shift 341
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 64
+	RB1  reduce 64
+	Add  reduce 64
+	Minus  reduce 64
+	Ando  reduce 64
+	Oro  reduce 64
 
 
 state 335
-	fml : EX LB1 Id Comma fml Comma Id . RB1  (117)
+	state_expr : Nego state_expr .  (65)
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
 
-	RB1  shift 343
-	.  error
+	.  reduce 65
 
 
 state 336
-	fml : AF LB1 Id Comma fml Comma Id . RB1  (118)
+	state_expr : Id LB1 . exp RB1  (63)
 
-	RB1  shift 344
+	LB1  shift 72
+	Minus  shift 73
+	Scalar  shift 74
+	Nego  shift 75
+	Id  shift 76
+	I  shift 77
+	B  shift 78
 	.  error
+
+	exp  goto 359
+	nested_var  goto 80
 
 
 state 337
-	fml : EG LB1 Id Comma fml Comma Id . RB1  (119)
+	atomics : atomics Id LB1 bound_var RB1 Assigno state_expr Semicolon .  (117)
 
-	RB1  shift 345
-	.  error
+	.  reduce 117
 
 
 state 338
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : AR LB1 Id Comma Id Comma fml . Comma fml Comma Id RB1  (120)
+	state_expr : state_expr Equal . state_expr  (66)
 
-	Comma  shift 346
-	And  shift 220
-	Or  shift 221
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
 	.  error
+
+	state_expr  goto 360
 
 
 state 339
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : EU LB1 Id Comma Id Comma fml . Comma fml Comma Id RB1  (121)
+	state_expr : state_expr Add . state_expr  (70)
 
-	Comma  shift 347
-	And  shift 220
-	Or  shift 221
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
 	.  error
+
+	state_expr  goto 361
 
 
 state 340
+	state_expr : state_expr Minus . state_expr  (71)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 362
+
+
+state 341
+	state_expr : state_expr Mult . state_expr  (72)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 363
+
+
+state 342
+	state_expr : state_expr Ando . state_expr  (68)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 364
+
+
+state 343
+	state_expr : state_expr Oro . state_expr  (69)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 365
+
+
+state 344
+	state_expr : state_expr Non_equal . state_expr  (67)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 366
+
+
+state 345
+	state_expr : state_expr Mod . state_expr  (73)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 367
+
+
+state 346
+	state_expr : state_expr LT . state_expr  (74)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 368
+
+
+state 347
+	state_expr : state_expr GT . state_expr  (75)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 369
+
+
+state 348
+	state_expr : state_expr LE . state_expr  (76)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 370
+
+
+state 349
+	state_expr : state_expr GE . state_expr  (77)
+
+	LB1  shift 319
+	Minus  shift 320
+	Nego  shift 321
+	Id  shift 322
+	.  error
+
+	state_expr  goto 371
+
+
+state 350
+	fml : AX LB1 Id Comma fml Comma Id . RB1  (133)
+
+	RB1  shift 372
+	.  error
+
+
+state 351
+	fml : EX LB1 Id Comma fml Comma Id . RB1  (134)
+
+	RB1  shift 373
+	.  error
+
+
+state 352
+	fml : AF LB1 Id Comma fml Comma Id . RB1  (135)
+
+	RB1  shift 374
+	.  error
+
+
+state 353
+	fml : EG LB1 Id Comma fml Comma Id . RB1  (136)
+
+	RB1  shift 375
+	.  error
+
+
+state 354
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : AR LB1 Id Comma Id Comma fml . Comma fml Comma Id RB1  (137)
+
+	Comma  shift 376
+	And  shift 217
+	Or  shift 218
+	.  error
+
+
+state 355
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : EU LB1 Id Comma Id Comma fml . Comma fml Comma Id RB1  (138)
+
+	Comma  shift 377
+	And  shift 217
+	Or  shift 218
+	.  error
+
+
+state 356
 	dexp : dexp . Equal dexp  (34)
 	dexp : dexp . Non_equal dexp  (35)
 	dexp : dexp . Ando dexp  (36)
@@ -4663,101 +4860,419 @@ state 340
 	dnested_var : Id LB2 dexp RB2 Dot Id LB2 dexp . RB2  (50)
 	dnested_var : Id LB2 dexp . RB2 Dot dnested_var  (52)
 
-	RB2  shift 348
-	Equal  shift 185
-	Add  shift 186
-	Minus  shift 187
-	Mult  shift 188
-	Ando  shift 189
-	Oro  shift 190
-	Non_equal  shift 191
-	Mod  shift 192
-	LT  shift 193
-	GT  shift 194
-	LE  shift 195
-	GE  shift 196
+	RB2  shift 378
+	Equal  shift 182
+	Add  shift 183
+	Minus  shift 184
+	Mult  shift 185
+	Ando  shift 186
+	Oro  shift 187
+	Non_equal  shift 188
+	Mod  shift 189
+	LT  shift 190
+	GT  shift 191
+	LE  shift 192
+	GE  shift 193
 	.  error
 
 
-state 341
-	rests : Id LB2 exp RB2 Assigno exp Semicolon . rests  (95)
-	rests : .  (93)
+state 357
+	rests : Id LB2 exp RB2 Assigno exp Semicolon . rests  (111)
+	rests : .  (109)
 
-	Id  shift 205
-	RB3  reduce 93
+	Id  shift 203
+	RB3  reduce 109
 
-	rests  goto 349
-
-
-state 342
-	fml : AX LB1 Id Comma fml Comma Id RB1 .  (116)
-
-	.  reduce 116
+	rests  goto 379
 
 
-state 343
-	fml : EX LB1 Id Comma fml Comma Id RB1 .  (117)
+state 358
+	state_expr : LB1 state_expr RB1 .  (78)
 
-	.  reduce 117
-
-
-state 344
-	fml : AF LB1 Id Comma fml Comma Id RB1 .  (118)
-
-	.  reduce 118
+	.  reduce 78
 
 
-state 345
-	fml : EG LB1 Id Comma fml Comma Id RB1 .  (119)
+state 359
+	state_expr : Id LB1 exp . RB1  (63)
+	exp : exp . Equal exp  (87)
+	exp : exp . Non_equal exp  (88)
+	exp : exp . Ando exp  (89)
+	exp : exp . Oro exp  (90)
+	exp : exp . Add exp  (91)
+	exp : exp . Minus exp  (92)
+	exp : exp . Mult exp  (93)
+	exp : exp . Mod exp  (94)
+	exp : exp . LT exp  (95)
+	exp : exp . GT exp  (96)
+	exp : exp . LE exp  (97)
+	exp : exp . GE exp  (98)
 
-	.  reduce 119
-
-
-state 346
-	fml : AR LB1 Id Comma Id Comma fml Comma . fml Comma Id RB1  (120)
-
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	RB1  shift 380
+	Equal  shift 102
+	Add  shift 103
+	Minus  shift 104
+	Mult  shift 105
+	Ando  shift 106
+	Oro  shift 107
+	Non_equal  shift 108
+	Mod  shift 109
+	LT  shift 110
+	GT  shift 111
+	LE  shift 112
+	GE  shift 113
 	.  error
 
-	fml  goto 350
+
+state 360
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr Equal state_expr .  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 66
 
 
-state 347
-	fml : EU LB1 Id Comma Id Comma fml Comma . fml Comma Id RB1  (121)
+state 361
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr Add state_expr .  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
 
-	Top  shift 158
-	Bottom  shift 159
-	AX  shift 160
-	EX  shift 161
-	AF  shift 162
-	EG  shift 163
-	AR  shift 164
-	EU  shift 165
-	Neg  shift 166
-	LB1  shift 167
-	Id  shift 214
+	Equal  shift 338
+	Mult  shift 341
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 70
+	RB1  reduce 70
+	Add  reduce 70
+	Minus  reduce 70
+	Ando  reduce 70
+	Oro  reduce 70
+
+
+state 362
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr Minus state_expr .  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	Equal  shift 338
+	Mult  shift 341
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 71
+	RB1  reduce 71
+	Add  reduce 71
+	Minus  reduce 71
+	Ando  reduce 71
+	Oro  reduce 71
+
+
+state 363
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr Mult state_expr .  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	Equal  shift 338
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 72
+	RB1  reduce 72
+	Add  reduce 72
+	Minus  reduce 72
+	Mult  reduce 72
+	Ando  reduce 72
+	Oro  reduce 72
+
+
+state 364
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr Ando state_expr .  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	Equal  shift 338
+	Add  shift 339
+	Minus  shift 340
+	Mult  shift 341
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 68
+	RB1  reduce 68
+	Ando  reduce 68
+	Oro  reduce 68
+
+
+state 365
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr Oro state_expr .  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	Equal  shift 338
+	Add  shift 339
+	Minus  shift 340
+	Mult  shift 341
+	Ando  shift 342
+	Non_equal  shift 344
+	Mod  shift 345
+	LT  shift 346
+	GT  shift 347
+	LE  shift 348
+	GE  shift 349
+	Semicolon  reduce 69
+	RB1  reduce 69
+	Oro  reduce 69
+
+
+state 366
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr Non_equal state_expr .  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 67
+
+
+state 367
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr Mod state_expr .  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 73
+
+
+state 368
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr LT state_expr .  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 74
+
+
+state 369
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr GT state_expr .  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 75
+
+
+state 370
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr LE state_expr .  (76)
+	state_expr : state_expr . GE state_expr  (77)
+
+	.  reduce 76
+
+
+state 371
+	state_expr : state_expr . Equal state_expr  (66)
+	state_expr : state_expr . Non_equal state_expr  (67)
+	state_expr : state_expr . Ando state_expr  (68)
+	state_expr : state_expr . Oro state_expr  (69)
+	state_expr : state_expr . Add state_expr  (70)
+	state_expr : state_expr . Minus state_expr  (71)
+	state_expr : state_expr . Mult state_expr  (72)
+	state_expr : state_expr . Mod state_expr  (73)
+	state_expr : state_expr . LT state_expr  (74)
+	state_expr : state_expr . GT state_expr  (75)
+	state_expr : state_expr . LE state_expr  (76)
+	state_expr : state_expr . GE state_expr  (77)
+	state_expr : state_expr GE state_expr .  (77)
+
+	.  reduce 77
+
+
+state 372
+	fml : AX LB1 Id Comma fml Comma Id RB1 .  (133)
+
+	.  reduce 133
+
+
+state 373
+	fml : EX LB1 Id Comma fml Comma Id RB1 .  (134)
+
+	.  reduce 134
+
+
+state 374
+	fml : AF LB1 Id Comma fml Comma Id RB1 .  (135)
+
+	.  reduce 135
+
+
+state 375
+	fml : EG LB1 Id Comma fml Comma Id RB1 .  (136)
+
+	.  reduce 136
+
+
+state 376
+	fml : AR LB1 Id Comma Id Comma fml Comma . fml Comma Id RB1  (137)
+
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
 	.  error
 
-	fml  goto 351
+	fml  goto 381
 
 
-state 348
+state 377
+	fml : EU LB1 Id Comma Id Comma fml Comma . fml Comma Id RB1  (138)
+
+	Top  shift 156
+	Bottom  shift 157
+	AX  shift 158
+	EX  shift 159
+	AF  shift 160
+	EG  shift 161
+	AR  shift 162
+	EU  shift 163
+	Neg  shift 164
+	LB1  shift 165
+	Id  shift 166
+	.  error
+
+	fml  goto 382
+
+
+state 378
 	dnested_var : Id LB2 dexp RB2 . Dot Id  (48)
 	dnested_var : Id LB2 dexp RB2 . Dot Id LB2 dexp RB2  (50)
 	dnested_var : Id LB2 dexp RB2 Dot Id LB2 dexp RB2 .  (50)
 	dnested_var : Id LB2 dexp RB2 . Dot dnested_var  (52)
 
-	Dot  shift 297
+	Dot  shift 295
 	Semicolon  reduce 50
 	RB1  reduce 50
 	RB2  reduce 50
@@ -4775,78 +5290,79 @@ state 348
 	GE  reduce 50
 
 
-state 349
-	rests : Id LB2 exp RB2 Assigno exp Semicolon rests .  (95)
+state 379
+	rests : Id LB2 exp RB2 Assigno exp Semicolon rests .  (111)
 
-	.  reduce 95
+	.  reduce 111
 
 
-state 350
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : AR LB1 Id Comma Id Comma fml Comma fml . Comma Id RB1  (120)
+state 380
+	state_expr : Id LB1 exp RB1 .  (63)
 
-	Comma  shift 352
-	And  shift 220
-	Or  shift 221
+	.  reduce 63
+
+
+state 381
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : AR LB1 Id Comma Id Comma fml Comma fml . Comma Id RB1  (137)
+
+	Comma  shift 383
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
-state 351
-	fml : fml . And fml  (114)
-	fml : fml . Or fml  (115)
-	fml : EU LB1 Id Comma Id Comma fml Comma fml . Comma Id RB1  (121)
+state 382
+	fml : fml . And fml  (131)
+	fml : fml . Or fml  (132)
+	fml : EU LB1 Id Comma Id Comma fml Comma fml . Comma Id RB1  (138)
 
-	Comma  shift 353
-	And  shift 220
-	Or  shift 221
+	Comma  shift 384
+	And  shift 217
+	Or  shift 218
 	.  error
 
 
-state 352
-	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma . Id RB1  (120)
+state 383
+	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma . Id RB1  (137)
 
-	Id  shift 354
+	Id  shift 385
 	.  error
 
 
-state 353
-	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma . Id RB1  (121)
+state 384
+	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma . Id RB1  (138)
 
-	Id  shift 355
+	Id  shift 386
 	.  error
 
 
-state 354
-	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma Id . RB1  (120)
+state 385
+	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma Id . RB1  (137)
 
-	RB1  shift 356
+	RB1  shift 387
 	.  error
 
 
-state 355
-	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma Id . RB1  (121)
+state 386
+	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma Id . RB1  (138)
 
-	RB1  shift 357
+	RB1  shift 388
 	.  error
 
 
-state 356
-	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma Id RB1 .  (120)
+state 387
+	fml : AR LB1 Id Comma Id Comma fml Comma fml Comma Id RB1 .  (137)
 
-	.  reduce 120
-
-
-state 357
-	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma Id RB1 .  (121)
-
-	.  reduce 121
+	.  reduce 137
 
 
-State 178 contains 1 shift/reduce conflict.
-State 199 contains 1 shift/reduce conflict.
-State 263 contains 1 shift/reduce conflict.
+state 388
+	fml : EU LB1 Id Comma Id Comma fml Comma fml Comma Id RB1 .  (138)
+
+	.  reduce 138
 
 
-55 terminals, 31 nonterminals
-127 grammar rules, 358 states
+55 terminals, 32 nonterminals
+143 grammar rules, 389 states
