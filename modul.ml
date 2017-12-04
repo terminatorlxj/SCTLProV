@@ -472,9 +472,13 @@ let rec next ia trans var_index_tbl =
 								| Const 1 -> ss := State_set.add (get_new_constant_array ia rests (Array.copy ia) var_index_tbl ) !ss; eval_trans trans'
 								| Const (0) -> eval_trans trans'
 								| _ -> print_endline ("error evaluating expression "^(str_expr e)^"."); exit 1)
-	| [] -> () in 
+	| [] -> () in
 	eval_trans trans; 
-	if State_set.is_empty !ss then ss := State_set.singleton ia;
+	if State_set.is_empty !ss then begin
+		print_endline ("deadlock detected in state "^(str_state (State ia)));
+		exit 1
+	end;
+	(* if State_set.is_empty !ss then ss := State_set.singleton ia; *)
 	(*print_endline ((string_of_int (State_set.cardinal !ss)) ^ "\tnext states.");*)
 	!ss
 
