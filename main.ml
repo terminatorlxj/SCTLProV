@@ -30,7 +30,9 @@ let choose_to_prove bdd output_file visualize_addr input_file =
 		let modl5 = modul425 modl4 in
 		match (bdd, output_file, visualize_addr) with
 		| (true, None, "") -> Prover_bdd.prove_model modl5
-		| (false, None, "") -> Prover.prove_model modl5
+		| (false, None, "") -> 
+			print_endline ("verifying on the model " ^ modl5.name ^"...");
+			Prover.prove_model modl5
 		| (_, Some filename, _) -> 
 			let out = open_out filename in
 			Prover_output.Seq_Prover.prove_model modl5 out filename;
