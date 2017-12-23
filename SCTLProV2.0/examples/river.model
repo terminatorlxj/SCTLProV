@@ -1,0 +1,43 @@
+Model River_Crossing()
+{
+	Var
+	{
+		farmer : bool;
+		wolf : bool;
+		goat : bool;
+		cabbage : bool;
+	}
+	
+	//initial state definition
+	/*
+		multi line comments
+	*/
+	Init
+	{
+		farmer = false;
+		wolf = false; 
+		goat = false;
+		cabbage = false;
+	}
+	
+	Transition
+	{
+		next s :=
+			(s.farmer = s.wolf) : s with {farmer = !s.farmer; wolf = !s.wolf;};
+			(s.farmer = s.goat) : s with {farmer = !s.farmer; goat = !s.goat;};
+			(s.farmer = s.cabbage) : s with {farmer = !s.farmer; cabbage = !s.cabbage;};
+			true : s with {farmer = !s.farmer;};
+	}
+	
+	Atomic
+	{
+		
+		safe (s) := ((!((s.wolf = s.goat) && (s.wolf != s.farmer))) && (!((s.goat = s.cabbage) && (s.goat != s.farmer))));
+		okay (s) := s.farmer = true && s.wolf = true && s.goat = true && s.cabbage = true;
+	}
+	
+	Spec
+	{
+		find := EU (x, y, safe (x), okay (y), init);
+	}
+}

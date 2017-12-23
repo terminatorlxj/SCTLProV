@@ -1,0 +1,1004 @@
+
+** Conflict (shift/reduce) in state 212.
+** Tokens involved: With Oro Non_Equal MultDot Mult MinusDot Minus LT LE LB2 LArrow GT GE Equal ColonColon At Ando AddDot Add
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal UIden expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 212, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+UIden expr_single 
+      expr_single . With LB3 str_expr_list RB3 
+
+** In state 212, looking ahead at With, reducing production
+** expr_single -> UIden expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+UIden expr_single . 
+
+** Conflict (shift/reduce) in state 209.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal Negb expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 209, looking ahead at With, reducing production
+** expr_single -> Negb expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+Negb expr_single . 
+
+** In state 209, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+Negb expr_single 
+     expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 208.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal MinusDot expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 208, looking ahead at With, reducing production
+** expr_single -> MinusDot expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+MinusDot expr_single . 
+
+** In state 208, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+MinusDot expr_single 
+         expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 207.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal Minus expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 207, looking ahead at With, reducing production
+** expr_single -> Minus expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+Minus expr_single . 
+
+** In state 207, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+Minus expr_single 
+      expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 199.
+** Token involved: Vertical
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal LB2 Vertical Match expr_single With pattern_expr_list 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 199, looking ahead at Vertical, reducing production
+** expr_single -> Match expr_single With pattern_expr_list 
+** is permitted because of the following sub-derivation:
+
+LB2 Vertical expr_single_list Vertical RB2 // lookahead token appears
+             expr_single // lookahead token is inherited
+             Match expr_single With pattern_expr_list . 
+
+** In state 199, looking ahead at Vertical, shifting is permitted
+** because of the following sub-derivation:
+
+LB2 Vertical expr_single_list Vertical RB2 
+             expr_single 
+             Match expr_single With pattern_expr_list 
+                                    pattern_expr_list . Vertical pattern_expr 
+
+** Conflict (shift/reduce) in state 195.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal Let pattern Equal expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 195, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+Let pattern Equal expr_single 
+                  expr_single . With LB3 str_expr_list RB3 
+
+** In state 195, looking ahead at With, reducing production
+** expr_single -> Let pattern Equal expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+Let pattern Equal expr_single . 
+
+** Conflict (shift/reduce) in state 165.
+** Token involved: Else
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal If expr_single Then If expr_single Then expr 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 165, looking ahead at Else, shifting is permitted
+** because of the following sub-derivation:
+
+If expr_single Then expr option(else_expr) 
+                    expr_single 
+                    If expr_single Then expr option(else_expr) 
+                                             else_expr 
+                                             . Else expr 
+
+** In state 165, looking ahead at Else, reducing production
+** option(else_expr) -> 
+** is permitted because of the following sub-derivation:
+
+If expr_single Then expr option(else_expr) // lookahead token appears because option(else_expr) can begin with Else
+                    expr_single // lookahead token is inherited
+                    If expr_single Then expr option(else_expr) // lookahead token is inherited
+                                             . 
+
+** Conflict (shift/reduce) in state 150.
+** Tokens involved: With Semicolon Oro Non_Equal MultDot Mult MinusDot Minus LT LE LB2 LArrow GT GE Equal ColonColon At Ando AddDot Add
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal If expr_single Then expr_single Semicolon expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 150, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+If expr_single Then expr option(else_expr) 
+                    expr_single Semicolon separated_nonempty_list(Semicolon,expr_single) 
+                                          expr_single 
+                                          expr_single . With LB3 str_expr_list RB3 
+
+** In state 150, looking ahead at With, reducing production
+** separated_nonempty_list(Semicolon,expr_single) -> expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+If expr_single Then expr option(else_expr) // lookahead token is inherited because option(else_expr) can vanish
+                    expr_single Semicolon separated_nonempty_list(Semicolon,expr_single) // lookahead token is inherited
+                                          expr_single . 
+
+** Conflict (shift/reduce) in state 147.
+** Tokens involved: With Semicolon Oro Non_Equal MultDot Mult MinusDot Minus LT LE LB2 LArrow GT GE Equal ColonColon At Ando AddDot Add
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal If expr_single Then expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 147, looking ahead at With, reducing production
+** expr -> expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+If expr_single Then expr option(else_expr) // lookahead token is inherited because option(else_expr) can vanish
+                    expr_single . 
+
+** In state 147, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+If expr_single Then expr option(else_expr) 
+                    expr_single 
+                    expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 142.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Ando expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 142, looking ahead at With, reducing production
+** expr_single -> expr_single Ando expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Ando expr_single . 
+
+** In state 142, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Ando expr_single 
+                 expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 140.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single ColonColon expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 140, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single ColonColon expr_single 
+                       expr_single . With LB3 str_expr_list RB3 
+
+** In state 140, looking ahead at With, reducing production
+** expr_single -> expr_single ColonColon expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single ColonColon expr_single . 
+
+** Conflict (shift/reduce) in state 138.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single GE expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 138, looking ahead at With, reducing production
+** expr_single -> expr_single GE expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single GE expr_single . 
+
+** In state 138, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single GE expr_single 
+               expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 136.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single GT expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 136, looking ahead at With, reducing production
+** expr_single -> expr_single GT expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single GT expr_single . 
+
+** In state 136, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single GT expr_single 
+               expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 134.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single LE expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 134, looking ahead at With, reducing production
+** expr_single -> expr_single LE expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single LE expr_single . 
+
+** In state 134, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single LE expr_single 
+               expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 132.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Add expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 132, looking ahead at With, reducing production
+** expr_single -> expr_single Add expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Add expr_single . 
+
+** In state 132, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Add expr_single 
+                expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 130.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single AddDot expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 130, looking ahead at With, reducing production
+** expr_single -> expr_single AddDot expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single AddDot expr_single . 
+
+** In state 130, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single AddDot expr_single 
+                   expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 128.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Equal expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 128, looking ahead at With, reducing production
+** expr_single -> expr_single Equal expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Equal expr_single . 
+
+** In state 128, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Equal expr_single 
+                  expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 126.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single LT expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 126, looking ahead at With, reducing production
+** expr_single -> expr_single LT expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single LT expr_single . 
+
+** In state 126, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single LT expr_single 
+               expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 124.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Minus expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 124, looking ahead at With, reducing production
+** expr_single -> expr_single Minus expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Minus expr_single . 
+
+** In state 124, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Minus expr_single 
+                  expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 121.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single At expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 121, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single At expr_single 
+               expr_single . With LB3 str_expr_list RB3 
+
+** In state 121, looking ahead at With, reducing production
+** expr_single -> expr_single At expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single At expr_single . 
+
+** Conflict (shift/reduce) in state 119.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single MinusDot expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 119, looking ahead at With, reducing production
+** expr_single -> expr_single MinusDot expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single MinusDot expr_single . 
+
+** In state 119, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single MinusDot expr_single 
+                     expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 117.
+** Tokens involved: With Oro Non_Equal MultDot Mult MinusDot Minus LT LE LB2 LArrow GT GE Equal ColonColon At Ando AddDot Add
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single LArrow expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 117, looking ahead at With, reducing production
+** expr_single -> expr_single LArrow expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single LArrow expr_single . 
+
+** In state 117, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single LArrow expr_single 
+                   expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 115.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Mult expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 115, looking ahead at With, reducing production
+** expr_single -> expr_single Mult expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Mult expr_single . 
+
+** In state 115, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Mult expr_single 
+                 expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 110.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single MultDot expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 110, looking ahead at With, reducing production
+** expr_single -> expr_single MultDot expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single MultDot expr_single . 
+
+** In state 110, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single MultDot expr_single 
+                    expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 108.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Non_Equal expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 108, looking ahead at With, reducing production
+** expr_single -> expr_single Non_Equal expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Non_Equal expr_single . 
+
+** In state 108, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Non_Equal expr_single 
+                      expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 106.
+** Tokens involved: With LB2 LArrow
+** The following explanations concentrate on token With.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single Oro expr_single 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 106, looking ahead at With, reducing production
+** expr_single -> expr_single Oro expr_single 
+** is permitted because of the following sub-derivation:
+
+expr_single With LB3 str_expr_list RB3 // lookahead token appears
+expr_single Oro expr_single . 
+
+** In state 106, looking ahead at With, shifting is permitted
+** because of the following sub-derivation:
+
+expr_single Oro expr_single 
+                expr_single . With LB3 str_expr_list RB3 
+
+** Conflict (shift/reduce) in state 98.
+** Token involved: Iden
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal expr_single With LB3 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      expr_single With LB3 str_expr_list RB3 
+                                                           (?)
+
+** In state 98, looking ahead at Iden, reducing production
+** str_expr_list -> 
+** is permitted because of the following sub-derivation:
+
+str_expr_list Iden Equal expr_single Semicolon // lookahead token appears
+. 
+
+** In state 98, looking ahead at Iden, shifting is permitted
+** because of the following sub-derivation:
+
+. Iden Equal expr_single Semicolon 
+
+** Conflict (shift/reduce) in state 78.
+** Token involved: Iden
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal LB3 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      LB3 str_expr_list RB3 
+                                          (?)
+
+** In state 78, looking ahead at Iden, reducing production
+** str_expr_list -> 
+** is permitted because of the following sub-derivation:
+
+str_expr_list Iden Equal expr_single Semicolon // lookahead token appears
+. 
+
+** In state 78, looking ahead at Iden, shifting is permitted
+** because of the following sub-derivation:
+
+. Iden Equal expr_single Semicolon 
+
+** Conflict (shift/reduce) in state 75.
+** Token involved: ColonColon
+** This state is reached from debug after reading:
+
+Function Iden UIden pattern 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Function Iden args option(type_of_expr) Equal expr 
+              pattern 
+              (?)
+
+** In state 75, looking ahead at ColonColon, shifting is permitted
+** because of the following sub-derivation:
+
+UIden pattern 
+      pattern . ColonColon pattern 
+
+** In state 75, looking ahead at ColonColon, reducing production
+** pattern -> UIden pattern 
+** is permitted because of the following sub-derivation:
+
+pattern ColonColon pattern // lookahead token appears
+UIden pattern . 
+
+** Conflict (shift/reduce) in state 49.
+** Tokens involved: Underline UIden LB2 LB1 Int Iden Float
+** The following explanations concentrate on token Underline.
+** This state is reached from debug after reading:
+
+Function Iden UIden 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Function Iden args option(type_of_expr) Equal expr 
+              (?)
+
+** In state 49, looking ahead at Underline, shifting is permitted
+** because of the following sub-derivation:
+
+pattern 
+UIden pattern 
+      . Underline 
+
+** In state 49, looking ahead at Underline, reducing production
+** pattern -> UIden 
+** is permitted because of the following sub-derivation:
+
+pattern args // lookahead token appears because args can begin with Underline
+UIden . 
+
+** Conflict (shift/reduce) in state 41.
+** Tokens involved: MinusDot Minus LB2
+** The following explanations concentrate on token MinusDot.
+** This state is reached from debug after reading:
+
+Value Iden option(type_of_expr) Equal UIden 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+                                      (?)
+
+** In state 41, looking ahead at MinusDot, shifting is permitted
+** because of the following sub-derivation:
+
+UIden expr_single 
+      . MinusDot expr_single 
+
+** In state 41, looking ahead at MinusDot, reducing production
+** expr_single -> UIden 
+** is permitted because of the following sub-derivation:
+
+expr_single MinusDot expr_single // lookahead token appears
+UIden . 
+
+** Conflict (shift/reduce) in state 35.
+** Token involved: Arrow
+** This state is reached from debug after reading:
+
+Value Iden Colon TLst typ 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+           type_of_expr 
+           Colon typ 
+                 (?)
+
+** In state 35, looking ahead at Arrow, reducing production
+** typ -> TLst typ 
+** is permitted because of the following sub-derivation:
+
+typ Arrow typ // lookahead token appears
+TLst typ . 
+
+** In state 35, looking ahead at Arrow, shifting is permitted
+** because of the following sub-derivation:
+
+TLst typ 
+     typ . Arrow typ 
+
+** Conflict (shift/reduce) in state 34.
+** Token involved: Arrow
+** This state is reached from debug after reading:
+
+Value Iden Colon TAray typ 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+           type_of_expr 
+           Colon typ 
+                 (?)
+
+** In state 34, looking ahead at Arrow, reducing production
+** typ -> TAray typ 
+** is permitted because of the following sub-derivation:
+
+typ Arrow typ // lookahead token appears
+TAray typ . 
+
+** In state 34, looking ahead at Arrow, shifting is permitted
+** because of the following sub-derivation:
+
+TAray typ 
+      typ . Arrow typ 
+
+** Conflict (shift/reduce) in state 15.
+** Tokens involved: TUnt TLst TInt TFloat TBool TAray LB3 LB1 Iden Arrow
+** The following explanations concentrate on token Arrow.
+** This state is reached from debug after reading:
+
+Value Iden Colon Iden typ 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+           type_of_expr 
+           Colon typ 
+                 (?)
+
+** In state 15, looking ahead at Arrow, reducing production
+** list(typ) -> 
+** is permitted because of the following sub-derivation:
+
+typ Arrow typ // lookahead token appears
+Iden list(typ) // lookahead token is inherited
+     typ list(typ) // lookahead token is inherited
+         . 
+
+** In state 15, looking ahead at Arrow, shifting is permitted
+** because of the following sub-derivation:
+
+Iden list(typ) 
+     typ list(typ) 
+     typ . Arrow typ 
+
+** Conflict (shift/reduce) in state 14.
+** Tokens involved: TUnt TLst TInt TFloat TBool TAray LB3 LB1 Iden
+** The following explanations concentrate on token TUnt.
+** This state is reached from debug after reading:
+
+Value Iden Colon Iden Iden 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+debug 
+declare EOF 
+Value Iden option(type_of_expr) Equal expr_single 
+           type_of_expr 
+           Colon typ 
+                 Iden list(typ) 
+                      (?)
+
+** In state 14, looking ahead at TUnt, reducing production
+** list(typ) -> 
+** is permitted because of the following sub-derivation:
+
+typ list(typ) // lookahead token appears because list(typ) can begin with TUnt
+Iden list(typ) // lookahead token is inherited
+     . 
+
+** In state 14, looking ahead at TUnt, shifting is permitted
+** because of the following sub-derivation:
+
+typ list(typ) 
+Iden list(typ) 
+     typ list(typ) 
+     . TUnt 
