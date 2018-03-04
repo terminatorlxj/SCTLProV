@@ -66,9 +66,13 @@ In addition to the compound types, the definition of user defined data types is 
 Users can define types in the following form.
 
 ```
-udt ::= constructor {"|" constructor}*
+udt ::= variant_type | record_type 
 
+variant_type ::= constructor {"|" constructor}*
 constructor ::= Iden | Iden type 
+
+record_type ::= "{" {type_bingding}* "}"
+type_binding ::= iden ":" type ";"
 ```
 
 **Remark:**  An `Iden` is an `iden` with the first letter in upper case.
@@ -90,7 +94,7 @@ type ::=
 User defined data types can be defined in a program as follows.
 
 ```
-udt_def ::= "datatype" iden "=" udt
+udt_def ::=   "datatype" iden "=" type (*to define new types or type aliases*)
 ```
 
 ## 2.3 Expressions
