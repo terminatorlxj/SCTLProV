@@ -6,6 +6,8 @@ Model River_Crossing()
 		wolf : bool;
 		goat : bool;
 		cabbage : bool;
+		testr: (0 .. 5);
+		tests: {#s1, #s2, #s3};
 	}
 	
 	//initial state definition
@@ -18,15 +20,23 @@ Model River_Crossing()
 		wolf = false; 
 		goat = false;
 		cabbage = false;
+		testr = 3;
+		tests = #s2;
 	}
 	
 	Transition
 	{
+		/*
 		next s :=
 			(s.farmer = s.wolf) : s with {farmer = !s.farmer; wolf = !s.wolf;};
 			(s.farmer = s.goat) : s with {farmer = !s.farmer; goat = !s.goat;};
 			(s.farmer = s.cabbage) : s with {farmer = !s.farmer; cabbage = !s.cabbage;};
 			true : s with {farmer = !s.farmer;};
+		*/
+		(farmer = wolf) : {farmer := !farmer; wolf := !wolf;};
+		(farmer = goat) : {farmer := !farmer; goat := !goat;};
+		(farmer = cabbage) : {farmer := !farmer; cabbage := !cabbage;};
+		true : {farmer := !farmer;};
 	}
 	
 	Atomic
