@@ -1,5 +1,5 @@
 # Compiling
-Go to the root directory of the code, and `make`, this would compile the program into an executable file `sct` in the same directory.
+Go to the root directory of the code, and `make`, this would compile the program into an executable file `sctl` in the same directory.
 
 **Compiling Environment Requirements**
 
@@ -8,8 +8,7 @@ Go to the root directory of the code, and `make`, this would compile the program
 
 # Running
 
-See 
-```sctl --help```.
+See ```sctl --help```.
 
 **In practice, SCTLProV runs faster (not very much) when the `-output` option is not specified. 
 So if efficiency is your main concern, do not use the output option.
@@ -22,5 +21,5 @@ See [this website](https://github.com/terminatorlxj/ctl_benchmarks).
 See [this file](https://github.com/terminatorlxj/ctl_benchmarks/blob/master/README.md).
 
 # Visualization
-We also wrote an visualization tool for the visualization of proof trees, called VMDV, which is also avaliable in [this website](https://github.com/terminatorlxj/vmdv). The proof tree produced by SCTLProV can be visualized in 3D space by VMDV. Interested readers may refer to the README file of VMDV for further usage information.
+We also wrote an visualization tool for the visualization of proof trees, called VMDV, which is also avaliable on [this website](https://github.com/terminatorlxj/vmdv). The proof tree produced by SCTLProV can be visualized in 3D space by VMDV. Interested readers may refer to the README file of VMDV for further usage information.
 

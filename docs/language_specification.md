@@ -1,11 +1,9 @@
 [TOC]
 
 # 1. Introduction
-
-This document specifies the new input language of the automated theorem prover [SCTLProV](https://github.com/terminatorlxj/SCTLProV). This input language is designed much like a ML-style real world programming language, in order to ease the task of generating Kripke models out of real world computer systems. 
+This document specifies the input language of the automated theorem prover [SCTLProV](https://github.com/terminatorlxj/SCTLProV). This input language is designed much like a ML-style real world programming language, in order to ease the task of generating Kripke models out of real world computer systems.
 
 # 2. The Input Language
-
 The specification of the new input language is organized to 4 parts: 
 
 1. Lexical tokens;
@@ -15,7 +13,6 @@ The specification of the new input language is organized to 4 parts:
 5. Programe structures.  
 
 ## 2.1 Lexical tokens
-
 The content of an input file is a sequence of characters, which will be recognized as a sequence of lexical tokens by a lexical analyzer. Among these tokens, a number is a sequence of digits, an identifier is a sequence of characters beginning with an alphabetic character, and followed by any sequence of characters in the set `{A-Z, a-Z, 0-9, _}`.
 
 The keywords are listed below:
@@ -29,7 +26,6 @@ The keywords are listed below:
 Any other tokens are in quotes in the syntax descriptions.
 
 ## 2.2 Datatype declarations
-
 Like in read world programming languages, the new input language consists of base types, compound types, and user defined types.
 
 ### 2.2.1 Base types
@@ -143,8 +139,8 @@ Expressions are terms of given types.
 ```
 expr ::=
         iden                (*variable or constructor name*)
-      | expr "." iden		(*select one field of a record*)
-      | expr "[" expr "]"	(*select one field of a array*)
+      | expr "." iden		  (*select one field of a record*)
+      | expr "[" expr "]"	  (*select one field of a array*)
       | "!" expr            (*logical negation*)
       | expr "&&" expr      (*logical and*)
       | expr "||" expr      (*logical or*)
@@ -152,10 +148,10 @@ expr ::=
       | expr "+" expr       (*integer addition*)
       | expr "-" expr       (*integer subtraction*)
       | expr "*" expr       (*integer multiplication*)
-      | "-." expr 			(*float negation*)
+      | "-." expr 			   (*float negation*)
       | expr "+." expr		(*float addition*)
       | expr "-." expr 		(*float subtraction*)
-      | expr "*." expr 		(*float multiplication*)
+      | expr "*." expr 	   (*float multiplication*)
       | expr "=" expr       (*expression equivalence*)
       | expr "!=" expr      (*expression non-equivalence*)
       | expr "<" expr       (*less than*)
@@ -219,7 +215,8 @@ datatype state = (int, int)
 value init = (0, 0)
 value bound = (10, 10)
 
-function increase ((fst, snd), x, y) : (state, int, int) -> state = (fst + x, snd + y)
+function increase ((fst, snd), x, y) : (state, int, int) -> state =
+    (fst + x, snd + y)
 function larger ((fst1, snd1), (fst2, snd2)) : (state, state) -> bool = 
 	(fst1 > fst2) && (snd1 > snd2)
 function next (s) : state -> list state =
@@ -233,7 +230,6 @@ The syntax of function definition is as follows.
 
 ```
 fun_def ::= iden "(" args ")" "=" expr
-
 args ::= pattern [":" type] {"," pattern [":" type]}*
 ```
 
@@ -267,7 +263,10 @@ The Kripke model is specified by the declaration as follows.
 
 ```
 kripke_def ::= "Model" "{"
-				//Define states as lists of state variables (a record), this is optional.
+				/*
+                Define states as lists of state variables (a record),
+                this is optional.
+              */
 				[
 					"Vars"  "{" 
 						{iden ":" type ";"}+ 
