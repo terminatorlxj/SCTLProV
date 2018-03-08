@@ -8,3 +8,4 @@ sctl.exe
 log
 *.log
 .DS_Store
+.vscode/*
