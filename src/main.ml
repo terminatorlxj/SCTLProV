@@ -130,11 +130,11 @@ let _ =
     let files = ref [] in
     let vis_addr = ref "" in
     Arg.parse [
-        "-visualize_addr ip", Arg.String (fun s -> vis_addr := s; Flags.visualize_addr := Some s), "\tIP address of the vmdv server";
+        "-visualize_addr ip", Arg.String (fun s -> vis_addr := s; Flags.visualize_addr := Some s), "\tIP address of the VMDV server";
         "-bdd", Arg.Unit (fun () -> Flags.using_bdd := true), "\tUsing BDD to store visited states";
-        "-optmize <true/false>", Arg.Bool (fun b -> Flags.optmization := b), "\tApplying optimization";
-        "-bcg <deadlock/livelock>", Arg.String (fun s -> Flags.bcg_property := s), "\tDetecting livelocks or deadlocks for BCG files"
-    ] (fun s -> files := !files @ [s]) "";
+        "-optmize", Arg.Bool (fun b -> Flags.optmization := b), "\tApplying optimization";
+        "-bcg", Arg.String (fun s -> Flags.bcg_property := s), "\tDetecting livelocks or deadlocks for BCG files"
+    ] (fun s -> files := !files @ [s]) "Usage: sctl [-optimize <true/false>] [-bcg <deadlock/livelock>] [-visualize_addr <ip>] files";
     let filename = List.hd !files in
     if List.nth (String.split_on_char '.' filename) 1 = "bcg" then begin
         let lstate = Bcg_interface.read_bcg filename in
