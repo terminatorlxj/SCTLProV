@@ -141,13 +141,12 @@ let _ =
         match !Flags.bcg_property with
         | "livelock" -> Prover_bcg.prove_model (Ks_bcg.create_model lstate) [(!Flags.bcg_property, Formula_bcg.EU (Formula_bcg.SVar "z", Formula_bcg.SVar "w", Formula_bcg.Top, Formula_bcg.EG (Formula_bcg.SVar "x", Formula_bcg.Atomic ("has_tau", [Formula_bcg.SVar "x"]), Formula_bcg.SVar "w"), Formula_bcg.SVar "ini"))] false false
         | _ -> Prover_bcg.prove_model (Ks_bcg.create_model lstate) [(!Flags.bcg_property, Formula_bcg.EU (Formula_bcg.SVar "x", Formula_bcg.SVar "y", Formula_bcg.Top, (Formula_bcg.Atomic ("is_deadlock", [Formula_bcg.SVar "y"])), Formula_bcg.SVar "ini"))] false false
-        (* | _ -> Prover_deadlock.prove_model (Ks_deadlock.create_model lstate) [(!Flags.bcg_property, Formula_deadlock.EU (Formula_deadlock.SVar "x", Formula_deadlock.SVar "y", Formula_deadlock.Top, (Formula_deadlock.Atomic ("P", [Formula_deadlock.SVar "y"])), Formula_deadlock.SVar "ini"))] true true *)
     end else if (!Flags.optmization) then begin
         try
-            print_endline "proving using old";
+
             choose_to_prove !Flags.using_bdd !Flags.output_file !Flags.visualize_addr (List.hd !files)
         with e ->
-            raise e;
+
             parse_and_prove !files !vis_addr
     end
 
