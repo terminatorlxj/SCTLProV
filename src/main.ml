@@ -139,8 +139,9 @@ let _ =
     if List.nth (String.split_on_char '.' filename) 1 = "bcg" then begin
         let lstate = Bcg_interface.read_bcg filename in
         match !Flags.bcg_property with
-        | "livelock" -> Prover_livelock.prove_model (Ks_livelock.create_model lstate) [(!Flags.bcg_property, Formula_livelock.EU (Formula_livelock.SVar "z", Formula_livelock.SVar "w", Formula_livelock.Top, Formula_livelock.EG (Formula_livelock.SVar "x", Formula_livelock.Atomic ("has_tau", [Formula_livelock.SVar "x"]), Formula_livelock.SVar "w"), Formula_livelock.SVar "ini"))] false false
-        | _ -> Prover_deadlock.prove_model (Ks_deadlock.create_model lstate) [(!Flags.bcg_property, Formula_deadlock.EU (Formula_deadlock.SVar "x", Formula_deadlock.SVar "y", Formula_deadlock.Top, (Formula_deadlock.Atomic ("P", [Formula_deadlock.SVar "y"])), Formula_deadlock.SVar "ini"))] true true
+        | "livelock" -> Prover_bcg.prove_model (Ks_bcg.create_model lstate) [(!Flags.bcg_property, Formula_bcg.EU (Formula_bcg.SVar "z", Formula_bcg.SVar "w", Formula_bcg.Top, Formula_bcg.EG (Formula_bcg.SVar "x", Formula_bcg.Atomic ("has_tau", [Formula_bcg.SVar "x"]), Formula_bcg.SVar "w"), Formula_bcg.SVar "ini"))] false false
+        | _ -> Prover_bcg.prove_model (Ks_bcg.create_model lstate) [(!Flags.bcg_property, Formula_bcg.EU (Formula_bcg.SVar "x", Formula_bcg.SVar "y", Formula_bcg.Top, (Formula_bcg.Atomic ("is_deadlock", [Formula_bcg.SVar "y"])), Formula_bcg.SVar "ini"))] false false
+        (* | _ -> Prover_deadlock.prove_model (Ks_deadlock.create_model lstate) [(!Flags.bcg_property, Formula_deadlock.EU (Formula_deadlock.SVar "x", Formula_deadlock.SVar "y", Formula_deadlock.Top, (Formula_deadlock.Atomic ("P", [Formula_deadlock.SVar "y"])), Formula_deadlock.SVar "ini"))] true true *)
     end else if (!Flags.optmization) then begin
         try
             choose_to_prove !Flags.using_bdd !Flags.output_file !Flags.visualize_addr (List.hd !files)

@@ -1,5 +1,5 @@
 (* open Term *)
-open Ks_livelock
+open Ks_bcg
 
 type state = 
 	| SVar of string

@@ -5,6 +5,8 @@ type kstate = {
   label: int;
 }
 
+let sd = {state = -1; label = -2;}
+
 let tau = ref (-1)
 
 exception No_next of kstate
@@ -51,6 +53,8 @@ let next ks s ignore_label =
   let lts_trans = Bcg_interface.trans s.state in
   (* print_string (str_kstate s);
   print_string "->"; *)
+  if lts_trans = [] then
+    nexts := State_label_set.add sd !nexts;
   List.iter (fun (ln, lv, ns) -> 
     if lv then begin
       (* print_string ((str_kstate {state = ns; label = ln;})^","); *)
@@ -66,3 +70,4 @@ let next ks s ignore_label =
 
 
 let has_tau s = s.label = !tau || s.label = (-2)
+let is_deadlock s = s.state = -1
