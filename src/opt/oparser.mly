@@ -331,7 +331,10 @@ exps: exp Comma exp	{[$1; $3]}
 	/* | exp Comma exps {$1 :: $3} */
 ;
 
-state_expr: Id LB1 exp RB1	{let i1 = position_in_state_var_list $1 !tmp_state_var_list in 
+state_expr: 
+		  I	{Const $1}
+		| B	{Const (if $1 then 1 else 0)}
+		| Id LB1 exp RB1	{let i1 = position_in_state_var_list $1 !tmp_state_var_list in 
 								if (i1 = -1) then
 								begin
 								print_endline ("state variable "^$1^" is not defined."); 

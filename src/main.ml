@@ -144,8 +144,10 @@ let _ =
         (* | _ -> Prover_deadlock.prove_model (Ks_deadlock.create_model lstate) [(!Flags.bcg_property, Formula_deadlock.EU (Formula_deadlock.SVar "x", Formula_deadlock.SVar "y", Formula_deadlock.Top, (Formula_deadlock.Atomic ("P", [Formula_deadlock.SVar "y"])), Formula_deadlock.SVar "ini"))] true true *)
     end else if (!Flags.optmization) then begin
         try
+            print_endline "proving using old";
             choose_to_prove !Flags.using_bdd !Flags.output_file !Flags.visualize_addr (List.hd !files)
-        with _ ->
+        with e ->
+            raise e;
             parse_and_prove !files !vis_addr
     end
 
