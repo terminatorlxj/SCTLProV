@@ -4,6 +4,9 @@ open Oterm
 open Oformula
 open Omodul
 
+let parse_error s = ()
+
+
 (********helper varaiables and functions for the parser*********)
 let tmp_parameter_list = ref [] 
 let tmp_var_list = ref []
@@ -103,7 +106,7 @@ let rec check_current_symbols stbl =
     stbl;
   !tmp_s
 (***************************************************************)
-let parse_error s = print_endline s
+(* let parse_error s = print_endline s *)
 %}
 
 %token Module Model Var Define Init Transition Fairness Atomic Spec 

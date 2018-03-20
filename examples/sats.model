@@ -738,7 +738,7 @@ Model SATS ()
 			(holding_pattern_descend (Left, s)) @ (holding_pattern_descend (Right, s)) @
 			(vertical_approach_initiation (Left, s)) @ (vertical_approach_initiation (Right, s)) @
 			(lateral_approach_initiation (Left, s)) @ (lateral_approach_initiation (Right, s)) @
-//			(merging (Left, s)) @ (merging (Right, s)) @
+			(merging (Left, s)) @ (merging (Right, s)) @
 			(exit (s)) @
 			(final_segment (s)) @
 			(landing (s)) @

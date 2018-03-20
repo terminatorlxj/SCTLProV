@@ -51,7 +51,8 @@ let choose_to_prove bdd output_file visualize_addr input_file =
 				printf "input arguments not valid\n";
 				flush stdout
 			end
-	with Parsing.Parse_error -> print_endline ("parse error at line: "^(string_of_int (!(Olexer.line_num))))
+    with e -> raise e
+    (* print_endline ("parse error at line: "^(string_of_int (!(Olexer.line_num)))) *)
 	
 
 let parse_and_prove fnames ip = 
@@ -89,9 +90,9 @@ let parse_and_prove fnames ip =
             output_string origin_out (Print.str_modul modul);
             flush origin_out; *)
             Hashtbl.add pmoduls mname modul
-        with Parser.Error -> 
-            let ep = lbuf.lex_curr_p in
-            printf "syntax error at line %d, column %d\n" ep.pos_lnum (ep.pos_cnum - ep.pos_bol)
+        with e -> raise e
+            (* let ep = lbuf.lex_curr_p in
+            (* printf "syntax error at line %d, column %d\n" ep.pos_lnum (ep.pos_cnum - ep.pos_bol) *) *)
     ) fnames;
     match !opkripke with
     | None -> print_endline "no kripke model was built, exit."; exit 1
@@ -143,10 +144,10 @@ let _ =
         | _ -> Prover_bcg.prove_model (Ks_bcg.create_model lstate) [(!Flags.bcg_property, Formula_bcg.EU (Formula_bcg.SVar "x", Formula_bcg.SVar "y", Formula_bcg.Top, (Formula_bcg.Atomic ("is_deadlock", [Formula_bcg.SVar "y"])), Formula_bcg.SVar "ini"))] false false
     end else if (!Flags.optmization) then begin
         try
-
+            (* print_endline "using opt version"; *)
             choose_to_prove !Flags.using_bdd !Flags.output_file !Flags.visualize_addr (List.hd !files)
-        with e ->
-
+        with _ ->
+            (* print_endline "not using opt version"; *)
             parse_and_prove !files !vis_addr
     end
 

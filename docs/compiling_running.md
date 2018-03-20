@@ -15,7 +15,7 @@ So if efficiency is your main concern, do not use the output option.
 When option `-bdd` is specified, SCTLProV usually consumes more time and less memory space than not using the `-bdd` option.**
 
 # Benchmarks
-See [this website](https://github.com/terminatorlxj/ctl_benchmarks). 
+See the file `benchmarks.md`', which is a description of the benchmarks in the `benchmarks` folder.
 
 # Batch Testing
 See [this file](https://github.com/terminatorlxj/ctl_benchmarks/blob/master/README.md).
