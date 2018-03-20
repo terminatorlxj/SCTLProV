@@ -17,8 +17,6 @@ When option `-bdd` is specified, SCTLProV usually consumes more time and less me
 # Benchmarks
 See the file `benchmarks.md`', which is a description of the benchmarks in the `benchmarks` folder.
 
-# Batch Testing
-See [this file](https://github.com/terminatorlxj/ctl_benchmarks/blob/master/README.md).
 
 # Visualization
 We also wrote an visualization tool for the visualization of proof trees, called VMDV, which is also avaliable on [this website](https://github.com/terminatorlxj/vmdv). The proof tree produced by SCTLProV can be visualized in 3D space by VMDV. Interested readers may refer to the README file of VMDV for further usage information.
